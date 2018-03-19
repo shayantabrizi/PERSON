@@ -28,8 +28,8 @@ public class AMinerPreprocessor {
         String inputFile = "authors_giant.txt";
         String outputFile = "authors_giant_graph.csv";
         AMinerPreprocessor aMinerPreprocessor = new AMinerPreprocessor();
-        convertDataset("/media/veracrypt5/Archieve/Research/Datasets/Papers Datasets/AMiner/citation-network2.txt", aMinerPreprocessor);
-//        PapersPreprocessor.convertAuthorsFileToGraphs(inputFile, outputFile);
+//        convertDataset("/media/veracrypt5/Archieve/Research/Datasets/Papers Datasets/AMiner/citation-network2.txt", aMinerPreprocessor);
+        PapersPreprocessor.convertAuthorsFileToGraphs(inputFile, outputFile);
 //        PapersPreprocessor.convertPapersFileToGraph("papers_giant.txt", "papers_giant_graph.csv");
     }
 
