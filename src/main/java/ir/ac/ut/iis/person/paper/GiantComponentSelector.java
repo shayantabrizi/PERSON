@@ -31,47 +31,46 @@ public class GiantComponentSelector {
 
     Set<Long> giant;
 
-    private static void pruneAuthorsGiant(String papersFile, String authorsFile) {
-        try (Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream("temp.txt")))) {
-            Set<Long> authorsSet = new HashSet<>();
-            try (Scanner pf = new Scanner(new BufferedInputStream(new FileInputStream(papersFile))); Scanner af = new Scanner(new BufferedInputStream(new FileInputStream(authorsFile)))) {
-                pf.useDelimiter("\n");
-                while (pf.hasNext()) {
-                    Paper readPaper = readPaper(pf);
-                    for (Long author : readPaper.authors) {
-                        authorsSet.add(author);
-                    }
-                }
-                af.useDelimiter("\n");
-
-                while (af.hasNext()) {
-                    String nextLine = af.next();
-                    Long id = Long.parseLong(nextLine);
-                    String name = af.next();
-                    String rels = af.next();
-                    if (!authorsSet.contains(id)) {
-                        continue;
-                    }
-
-                    String conv = "";
-                    if (!rels.isEmpty()) {
-                        for (String ref : rels.split(",")) {
-                            String[] split = ref.split(" ");
-                            if (authorsSet.contains(Long.parseLong(split[0]))) {
-                                conv += split[0] + " " + split[1] + ",";
-                            }
-                        }
-                    }
-                    writer.write(id + "\n");
-                    writer.write(name + "\n");
-                    writer.write(conv + "\n");
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
+//    private static void pruneAuthorsGiant(String papersFile, String authorsFile) {
+//        try (Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream("temp.txt")))) {
+//            Set<Long> authorsSet = new HashSet<>();
+//            try (Scanner pf = new Scanner(new BufferedInputStream(new FileInputStream(papersFile))); Scanner af = new Scanner(new BufferedInputStream(new FileInputStream(authorsFile)))) {
+//                pf.useDelimiter("\n");
+//                while (pf.hasNext()) {
+//                    Paper readPaper = readPaper(pf);
+//                    for (Long author : readPaper.authors) {
+//                        authorsSet.add(author);
+//                    }
+//                }
+//                af.useDelimiter("\n");
+//
+//                while (af.hasNext()) {
+//                    String nextLine = af.next();
+//                    Long id = Long.parseLong(nextLine);
+//                    String name = af.next();
+//                    String rels = af.next();
+//                    if (!authorsSet.contains(id)) {
+//                        continue;
+//                    }
+//
+//                    String conv = "";
+//                    if (!rels.isEmpty()) {
+//                        for (String ref : rels.split(",")) {
+//                            String[] split = ref.split(" ");
+//                            if (authorsSet.contains(Long.parseLong(split[0]))) {
+//                                conv += split[0] + " " + split[1] + ",";
+//                            }
+//                        }
+//                    }
+//                    writer.write(id + "\n");
+//                    writer.write(name + "\n");
+//                    writer.write(conv + "\n");
+//                }
+//            }
+//        } catch (IOException ex) {
+//            Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     public void convertPapersFile(String papersFile, String outputFileName) {
         int i = 0;
         Set<Long> giantDocs = new HashSet<>();
@@ -174,24 +173,20 @@ public class GiantComponentSelector {
                     String name = sc.next();
                     String rels = sc.next();
                     if (giant.contains(id) && authorsSet.contains(id)) {
-                        boolean ch = false;
                         String conv = "";
                         if (!rels.isEmpty()) {
                             for (String ref : rels.split(",")) {
                                 String[] split = ref.split(" ");
                                 final long parseLong = Long.parseLong(split[0]);
                                 if (giant.contains(parseLong) && authorsSet.contains(parseLong)) {
-                                    ch = true;
                                     conv += split[0] + " " + split[1] + ",";
                                 }
                             }
                         }
 
-                        if (ch) {
-                            writer.write(id + "\n");
-                            writer.write(name + "\n");
-                            writer.write(conv + "\n");
-                        }
+                        writer.write(id + "\n");
+                        writer.write(name + "\n");
+                        writer.write(conv + "\n");
                     }
                 }
             }

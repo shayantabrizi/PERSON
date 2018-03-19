@@ -161,7 +161,7 @@ public abstract class DatasetMain implements Closeable {
                 throw new RuntimeException();
             }
         } else {
-            throw new RuntimeException("Index folder not found");
+            throw new RuntimeException("Index folder not found: " + Configs.datasetRoot + "/index/" + Configs.indexName);
         }
         return indexSearcher;
     }
