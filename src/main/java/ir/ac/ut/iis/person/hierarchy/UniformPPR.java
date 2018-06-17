@@ -5,8 +5,6 @@
  */
 package ir.ac.ut.iis.person.hierarchy;
 
-import ir.ac.ut.iis.person.Configs;
-
 /**
  *
  * @author shayan

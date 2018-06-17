@@ -5,10 +5,10 @@
  */
 package ir.ac.ut.iis.person.algorithms.searchers;
 
-import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import ir.ac.ut.iis.person.DatasetMain;
 import ir.ac.ut.iis.person.base.IgnoreQueryEx;
 import ir.ac.ut.iis.person.query.QueryConverter;
+import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

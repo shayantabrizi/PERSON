@@ -5,9 +5,9 @@ package ir.ac.ut.iis.person.datasets.lastfm;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import ir.ac.ut.iis.retrieval_tools.domain.MyIterable;
 import ir.ac.ut.iis.person.hierarchy.Hierarchy;
 import ir.ac.ut.iis.person.hierarchy.HierarchyNode;
+import ir.ac.ut.iis.retrieval_tools.domain.MyIterable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -5,10 +5,10 @@
  */
 package ir.ac.ut.iis.person.datasets.citeseerx.old;
 
-import ir.ac.ut.iis.retrieval_tools.azimi.TaxonomyHierarchyReader;
-import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor.MapUtil;
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.others.ExtractTopicGraphs.AuthorsPair;
+import ir.ac.ut.iis.retrieval_tools.azimi.TaxonomyHierarchyReader;
+import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor.MapUtil;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;

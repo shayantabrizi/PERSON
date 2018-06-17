@@ -5,11 +5,11 @@
  */
 package ir.ac.ut.iis.person.datasets.citeseerx.old;
 
+import ir.ac.ut.iis.person.Configs;
+import static ir.ac.ut.iis.person.datasets.citeseerx.old.GraphExtractor.readWeights;
 import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
 import ir.ac.ut.iis.retrieval_tools.domain.MyIterable;
 import ir.ac.ut.iis.retrieval_tools.papers.BasePaper;
-import ir.ac.ut.iis.person.Configs;
-import static ir.ac.ut.iis.person.datasets.citeseerx.old.GraphExtractor.readWeights;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;

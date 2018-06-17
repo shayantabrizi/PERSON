@@ -57,15 +57,15 @@ public class PapersMain extends DatasetMain {
 
     @Override
     protected Hierarchy loadHierarchy() {
-        return loadHierarchy(Configs.datasetRoot + Configs.graphFile, Configs.clustersFileName == null ? null : Configs.datasetRoot + "clusters/" + Configs.clustersFileName + ".tree", Configs.clustersFileName, false, false);
+        return loadHierarchy(Configs.datasetRoot + Configs.graphFile, Configs.clustersFileName == null ? null : Configs.datasetRoot + "clusters/" + Configs.clustersFileName + ".tree", Configs.clustersFileName, false, false, false);
     }
 
     @Override
-    public Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters) {
+    public Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) {
         Hierarchy hier;
         try {
             hier = new Hierarchy<>(name);
-            hier.load(false, null, null, Configs.loadGraph ? clustersFile : null, addNodesAsClusters);
+            hier.load(false, null, null, Configs.loadGraph ? clustersFile : null, addNodesAsClusters, loadAsFlatHierarchy);
 //            hiers[1] = new Hierarchy(Main.datasetRoot+"clusters/web_20.tree", "web_20");
 //            hiers[1].load(false, Main.datasetRoot+"index/web_20-only", hiers[0]);
 //                Hierarchy hier3 = new Hierarchy(Main.datasetRoot+"clusters/verification.tree", "verification");
@@ -109,7 +109,7 @@ public class PapersMain extends DatasetMain {
     protected void createIndexes(String topic, String tree, String rootIndex, String index, boolean makeRootIndex) {
         try {
             Hierarchy hier = new Hierarchy<>("temp");
-            hier.load(true, rootIndex, index, !makeRootIndex ? tree : null, false);
+            hier.load(true, rootIndex, index, !makeRootIndex ? tree : null, false, false);
 
             PapersExtractor extractor = new PapersExtractor();
 

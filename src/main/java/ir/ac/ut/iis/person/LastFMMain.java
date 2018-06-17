@@ -32,7 +32,7 @@ public class LastFMMain extends DatasetMain {
         Hierarchy hier;
         try {
             hier = new Hierarchy<>("general");
-            hier.load(false, "../datasets/lastfm/lastfm-index", "../datasets/lastfm/lastfm-index/general-only", "/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/hier_friends_clean.tree", false);
+            hier.load(false, "../datasets/lastfm/lastfm-index", "../datasets/lastfm/lastfm-index/general-only", "/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/hier_friends_clean.tree", false, false);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException();
@@ -59,7 +59,7 @@ public class LastFMMain extends DatasetMain {
     private static void createIndexes(String tree, String rootIndex, String index, boolean makeRootIndex) {
         try {
             Hierarchy hier = new Hierarchy<>("temp");
-            hier.load(true, rootIndex, index, !makeRootIndex ? tree : null, false);
+            hier.load(true, rootIndex, index, !makeRootIndex ? tree : null, false, false);
 
             LastFMExtractor extractor = new LastFMExtractor();
             extractor.doParseAndIndex(hier, makeRootIndex, "/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/users_track.csv", "/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/track_tag.csv");
@@ -178,7 +178,7 @@ public class LastFMMain extends DatasetMain {
 //        }
 //    }
     @Override
-    public Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters) {
+    public Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

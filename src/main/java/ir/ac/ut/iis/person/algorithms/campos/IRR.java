@@ -5,10 +5,10 @@
  */
 package ir.ac.ut.iis.person.algorithms.campos;
 
-import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import ir.ac.ut.iis.person.query.Query;
 import ir.ac.ut.iis.person.query.QueryConverter;
 import ir.ac.ut.iis.person.query.QueryExpander;
+import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

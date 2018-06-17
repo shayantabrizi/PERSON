@@ -5,13 +5,13 @@
  */
 package ir.ac.ut.iis.person.paper;
 
+import ir.ac.ut.iis.person.datasets.citeseerx.CiteseerxPreprocessor;
 import ir.ac.ut.iis.retrieval_tools.Config;
 import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
 import ir.ac.ut.iis.retrieval_tools.domain.Edge;
 import ir.ac.ut.iis.retrieval_tools.papers.Author;
 import ir.ac.ut.iis.retrieval_tools.papers.BasePaper;
 import ir.ac.ut.iis.retrieval_tools.papers.PreprocessedPaper;
-import ir.ac.ut.iis.person.datasets.citeseerx.CiteseerxPreprocessor;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;

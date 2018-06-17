@@ -5,7 +5,6 @@
  */
 package ir.ac.ut.iis.person.algorithms.searchers;
 
-import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.Main;
 import ir.ac.ut.iis.person.algorithms.social_textual.citeseerx.CiteseerxSocialTextualValueSource;
@@ -13,6 +12,7 @@ import ir.ac.ut.iis.person.base.Searcher;
 import ir.ac.ut.iis.person.query.Query;
 import ir.ac.ut.iis.person.query.Query.Result;
 import ir.ac.ut.iis.person.query.QueryConverter;
+import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;

@@ -6,7 +6,6 @@
 package ir.ac.ut.iis.person.evaluation.person;
 
 import com.google.common.base.Objects;
-import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.DatasetMain;
 import ir.ac.ut.iis.person.algorithms.searchers.BasicSearcher;
@@ -17,6 +16,7 @@ import ir.ac.ut.iis.person.paper.PapersRetriever;
 import ir.ac.ut.iis.person.query.Query;
 import ir.ac.ut.iis.person.query.QueryExpander;
 import ir.ac.ut.iis.person.query.QueryExpander.Profile;
+import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;

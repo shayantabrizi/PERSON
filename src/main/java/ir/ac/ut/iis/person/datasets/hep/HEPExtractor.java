@@ -4,13 +4,13 @@
  */
 package ir.ac.ut.iis.person.datasets.hep;
 
-import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
-import ir.ac.ut.iis.retrieval_tools.domain.MyIterable;
-import ir.ac.ut.iis.retrieval_tools.papers.Author;
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.hierarchy.Hierarchy;
 import ir.ac.ut.iis.person.hierarchy.HierarchyNode;
 import ir.ac.ut.iis.person.paper.Paper;
+import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
+import ir.ac.ut.iis.retrieval_tools.domain.MyIterable;
+import ir.ac.ut.iis.retrieval_tools.papers.Author;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.apache.lucene.document.TextField;
 
 /**
  *
- * @author GOMROK IRAN
+ * @author Shayan
  */
 public class HEPExtractor {
 

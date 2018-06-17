@@ -5,10 +5,10 @@
  */
 package ir.ac.ut.iis.person.datasets.aminer;
 
-import ir.ac.ut.iis.retrieval_tools.papers.PreprocessedPaper;
 import ir.ac.ut.iis.person.paper.BasicAuthorFactory;
 import ir.ac.ut.iis.person.paper.DisambiguatedAuthorFactory;
 import ir.ac.ut.iis.person.paper.PapersPreprocessor;
+import ir.ac.ut.iis.retrieval_tools.papers.PreprocessedPaper;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

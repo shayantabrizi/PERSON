@@ -5,10 +5,10 @@
  */
 package ir.ac.ut.iis.person.datasets.citeseerx;
 
-import ir.ac.ut.iis.retrieval_tools.crawler.IterableToFiles;
-import ir.ac.ut.iis.retrieval_tools.crawler.IterateOnFiles;
 import ir.ac.ut.iis.person.paper.DisambiguatedAuthorFactory;
 import ir.ac.ut.iis.person.paper.PapersPreprocessor;
+import ir.ac.ut.iis.retrieval_tools.crawler.IterableToFiles;
+import ir.ac.ut.iis.retrieval_tools.crawler.IterateOnFiles;
 import java.io.File;
 import java.util.List;
 

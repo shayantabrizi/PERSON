@@ -6,6 +6,7 @@
 package ir.ac.ut.iis.person.base;
 
 import ir.ac.ut.iis.person.Configs;
+import ir.ac.ut.iis.person.DatasetMain;
 import ir.ac.ut.iis.person.Main;
 import ir.ac.ut.iis.person.algorithms.aggregate.MyCustomScoreProvider;
 import ir.ac.ut.iis.person.evaluation.Evaluator;
@@ -369,15 +370,6 @@ public abstract class Retriever implements Closeable {
             if (q.isIgnored()) {
                 continue;
             }
-            List<Query.Result> r1 = null;
-            List<Query.Result> r2 = null;
-            for (Map.Entry<String, List<Query.Result>> r : q.getResults().entrySet()) {
-                if (r1 != null) {
-                    r2 = r.getValue();
-                } else {
-                    r1 = r.getValue();
-                }
-            }
             totalRelevants += q.getRelevants().keySet().size();
             retrievedRelevants += q.getFoundRelevants().size();
             if (verbose) {
@@ -431,6 +423,14 @@ public abstract class Retriever implements Closeable {
                     if (k < 10) {
                         pAt10 += d.getRelevancy();
                     }
+//                    try {
+//                        if (q.getIgnoredResults().contains(DatasetMain.getInstance().getIndexReader().document(d.getDocId()).get("id"))) {
+//                            throw new RuntimeException();
+//                        }
+//                    } catch (IOException ex) {
+//                        Logger.getLogger(Retriever.class.getName()).log(Level.SEVERE, null, ex);
+//                        throw new RuntimeException();
+//                    }
                     get1.set(k, get1.get(k) + d.getRelevancy());
                     k++;
                     if (d.getRelevancy().equals(1.)) {

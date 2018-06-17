@@ -5,7 +5,6 @@
  */
 package ir.ac.ut.iis.person;
 
-import ir.ac.ut.iis.retrieval_tools.Config;
 import ir.ac.ut.iis.person.evaluation.person.PERSONEvaluator;
 import ir.ac.ut.iis.person.hierarchy.Hierarchy;
 import ir.ac.ut.iis.person.hierarchy.HierarchyNode;
@@ -13,6 +12,7 @@ import ir.ac.ut.iis.person.hierarchy.User;
 import ir.ac.ut.iis.person.hierarchy.UserFactory;
 import ir.ac.ut.iis.person.myretrieval.CachedIndexSearcher;
 import ir.ac.ut.iis.person.paper.TopicsReader;
+import ir.ac.ut.iis.retrieval_tools.Config;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -85,7 +85,7 @@ public abstract class DatasetMain implements Closeable {
 
     protected abstract Hierarchy loadHierarchy();
 
-    public abstract Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters);
+    public abstract Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters, boolean loadAsFlatHierarchy);
 
     public IndexSearcher getIndexSearcher() {
         return indexSearcher;

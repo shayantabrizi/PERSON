@@ -4,8 +4,6 @@
  */
 package ir.ac.ut.iis.person.datasets.citeseerx;
 
-import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
-import ir.ac.ut.iis.retrieval_tools.papers.Author;
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.DatasetMain;
 import ir.ac.ut.iis.person.algorithms.aggregate.AggregateSearcher;
@@ -14,6 +12,8 @@ import ir.ac.ut.iis.person.hierarchy.Hierarchy;
 import ir.ac.ut.iis.person.hierarchy.HierarchyNode;
 import ir.ac.ut.iis.person.paper.Paper;
 import ir.ac.ut.iis.person.paper.TopicsReader;
+import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
+import ir.ac.ut.iis.retrieval_tools.papers.Author;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -47,7 +47,7 @@ import org.apache.lucene.util.Bits;
 
 /**
  *
- * @author GOMROK IRAN
+ * @author Shayan
  */
 public class PapersExtractor {
 

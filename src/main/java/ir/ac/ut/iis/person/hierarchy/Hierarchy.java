@@ -56,9 +56,9 @@ public class Hierarchy<U extends User> {
         return userNodeMapping;
     }
 
-    public void load(String clustersFile, boolean create, String indexersRoot, Hierarchy hier, boolean addNodesAsClusters) throws IOException {
+    public void load(String clustersFile, boolean create, String indexersRoot, Hierarchy hier, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) throws IOException {
         rootNode.setPath(indexersRoot);
-        this.loadHierarchy(create, clustersFile, addNodesAsClusters);
+        this.loadHierarchy(create, clustersFile, addNodesAsClusters, loadAsFlatHierarchy);
         rootNode.setValues(hier.rootNode);
     }
 
@@ -75,12 +75,12 @@ public class Hierarchy<U extends User> {
         }
     }
 
-    public void load(boolean create, String rootIndexer, String indexersRoot, String clustersFile, boolean addNodesAsClusters) throws IOException {
+    public void load(boolean create, String rootIndexer, String indexersRoot, String clustersFile, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) throws IOException {
         rootNode.setPath(indexersRoot);
         rootNode.setLevel((short) 0);
 
         if (clustersFile != null) {
-            this.loadHierarchy(create, clustersFile, addNodesAsClusters);
+            this.loadHierarchy(create, clustersFile, addNodesAsClusters, loadAsFlatHierarchy);
         }
 
         rootNode.setPath(rootIndexer);
@@ -103,7 +103,7 @@ public class Hierarchy<U extends User> {
                 new File(relativePath).toPath()), new IndexWriterConfig(new DatasetMain.MyAnalyzer()));
     }
 
-    public void loadHierarchy(boolean create, String clustersFile, boolean addNodesAsClusters) throws FileNotFoundException, CorruptIndexException, CorruptIndexException, LockObtainFailedException, IOException {
+    public void loadHierarchy(boolean create, String clustersFile, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) throws FileNotFoundException, CorruptIndexException, CorruptIndexException, LockObtainFailedException, IOException {
         Logger.getLogger(Hierarchy.class.getName()).log(Level.INFO, "Loading hierarchy started.");
         try (Scanner scanner = new Scanner(new File(clustersFile))) {
             String topLevelCluster = null;
@@ -130,13 +130,18 @@ public class Hierarchy<U extends User> {
                             continue;
                         }
                     }
+                    if (loadAsFlatHierarchy) {
+                        if (stringTokenizer.hasMoreTokens()) {
+                            continue;
+                        }
+                    }
                     HierarchyNode get = currentNode.getChildren().get(Short.parseShort(token));
                     if (get == null) {
                         get = createHierarchyNode(currentNode, Integer.parseInt(token), create);
                     }
                     currentNode = get;
                 }
-                if (addNodesAsClusters) {
+                if (addNodesAsClusters || currentNode == rootNode) {
                     currentNode = createHierarchyNode(currentNode, -(code + 1), create);
                 }
                 GraphNode user = new GraphNode(DatasetMain.getInstance().getUser(code), currentNode);
