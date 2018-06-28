@@ -21,27 +21,20 @@ import java.util.Set;
  */
 public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
 
-    private boolean penalizeMultipleAuthors = true;
-    private boolean useUserWeights = true;
-    private boolean useFriendWeight = true;
+    private final boolean useFriendWeight = true;
+    private final double selfConsiderConstant;
 
     HashMap<Integer, Double> userWeights = new HashMap();
     final int MAX_USER_DEGREE = 100;  //max number of neighbours
 
     public CiteseerxSocialTextualValueSource(String database_name) {
         super(database_name);
+        selfConsiderConstant = Configs.selfConsiderConstant;
     }
 
-    public void setPenalizeMultipleAuthors(boolean penalizeMultipleAuthors) {
-        this.penalizeMultipleAuthors = penalizeMultipleAuthors;
-    }
-
-    public void setUseUserWeights(boolean useUserWeights) {
-        this.useUserWeights = useUserWeights;
-    }
-
-    public void setUseFriendWeight(boolean useFriendWeight) {
-        this.useFriendWeight = useFriendWeight;
+    public CiteseerxSocialTextualValueSource(String database_name, double selfConsiderConstant) {
+        super(database_name);
+        this.selfConsiderConstant = selfConsiderConstant;
     }
 
     @Override
@@ -68,7 +61,7 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
             QueryResult uMap = userTrackWeightSimple.get(friendId);
             double friendWeight = 1;
             if (useFriendWeight) {
-                friendWeight = 1.0 / ((Number) me.getValue()).intValue();
+                friendWeight = 1.0 / ((Number) me.getValue()).doubleValue();
             }
             Map utMap; //tracks for this friend
             utMap = uMap.map;
@@ -77,10 +70,7 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
             Iterator j = tracksSet.iterator();
             while (j.hasNext()) {
                 Map.Entry me2 = (Map.Entry) j.next();
-                double trackWeight = 1;
-                if (penalizeMultipleAuthors) {
-                    trackWeight = ((Number) me2.getValue()).doubleValue(); //normalize?
-                }
+                double trackWeight = ((Number) me2.getValue()).doubleValue(); //normalize?
                 double userWeight = uMap.friendsCoauthors;
                 userWeight /= MAX_USER_DEGREE;
                 userWeight = Math.min(userWeight, 1);
@@ -181,13 +171,11 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
 
         //writing the final set
 //        System.out.println("-------friends for user " + userId + " , degree = " + degree + "---------");
-        uuMap.remove(userId);
-        Set set = uuMap.entrySet();
-        Iterator i = set.iterator();
-//        while (i.hasNext()) {
-//            Map.Entry me = (Map.Entry) i.next();
-        //           System.out.println(me.getKey() + " : " + me.getValue());
-//        }
+        if (selfConsiderConstant == 0.) {
+            uuMap.remove(userId);
+        } else {
+            uuMap.put(userId, selfConsiderConstant);
+        }
         return uuMap;
     }//getFriends
 
@@ -258,7 +246,6 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
                 }
                 //    System.out.println(id + "," + playCountNormWeight);
                 get.map.put(id, contributionInPaper);
-
             } //end while
             stmt.close();
         } catch (SQLException e) {
