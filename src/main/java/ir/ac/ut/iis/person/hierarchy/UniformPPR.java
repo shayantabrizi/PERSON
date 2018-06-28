@@ -14,8 +14,8 @@ public class UniformPPR extends PPRCalculator {
     final Iterable<GraphNode> topic;
     final int topicSize;
 
-    public UniformPPR(int topicNodeId, Iterable<GraphNode> topic, int topicSize) {
-        super(topicNodeId);
+    public UniformPPR(int topicNodeId, Iterable<GraphNode> topic, int topicSize, double pageRankAlpha) {
+        super(topicNodeId, pageRankAlpha);
         this.topic = topic;
         this.topicSize = topicSize;
     }

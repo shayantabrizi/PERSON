@@ -20,16 +20,22 @@ public class MyCustomScoreQuery extends org.apache.lucene.queries.CustomScoreQue
 
     private final float personalizationWeight;
     private final float textualWeight;
+    private final boolean powTextual;
+    private final float normalizationFactor;
 
-    public MyCustomScoreQuery(Query subQuery, FunctionQuery fq, float personalizationWeight, float textualWeight) {
+    // powTextual = true means convert textual_weight to e^textual_weight before combining it with personalization weight
+    // normalizationFactor=0f means do not normalize
+    public MyCustomScoreQuery(Query subQuery, FunctionQuery fq, float personalizationWeight, float textualWeight, boolean powTextual, float normalizationFactor) {
         super(subQuery, fq);
         this.personalizationWeight = personalizationWeight;
         this.textualWeight = textualWeight;
+        this.powTextual = powTextual;
+        this.normalizationFactor = normalizationFactor;
     }
 
     @Override
     protected CustomScoreProvider getCustomScoreProvider(LeafReaderContext context) throws IOException {
-        return new MyCustomScoreProvider(context, personalizationWeight, textualWeight); //To change body of generated methods, choose Tools | Templates.
+        return new MyCustomScoreProvider(context, personalizationWeight, textualWeight, powTextual, normalizationFactor);
     }
 
     @Override

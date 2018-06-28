@@ -20,7 +20,7 @@ import java.util.List;
 public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, User> {
 
     private final ObjectArrayList<HierarchicalEdge> edges = new ObjectArrayList<>();
-    private final Object2ObjectOpenHashMap<PPRCalculator, float[]> ppr = new Object2ObjectOpenHashMap<>(1, .75f);
+    private final Object2ObjectOpenHashMap<MeasureCalculator, float[]> measure = new Object2ObjectOpenHashMap<>(1, .75f);
     private float[][] degree;
     private final HierarchyNode hierarchyNode;
 //    private Object processingDummy;
@@ -89,20 +89,20 @@ public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, User>
         return get;
     }
 
-    public Object2ObjectOpenHashMap<PPRCalculator, float[]> getPPR() {
-        return ppr;
+    public Object2ObjectOpenHashMap<MeasureCalculator, float[]> getMeasure() {
+        return measure;
     }
 
-    public float[] getPPR(PPRCalculator clusterId) {
-        return ppr.get(clusterId);
+    public float[] getMeasure(MeasureCalculator clusterId) {
+        return measure.get(clusterId);
     }
 
-    public void addPPR(PPRCalculator clusterId, float[] ppr) {
-        this.ppr.put(clusterId, ppr);
+    public void addMeasure(MeasureCalculator clusterId, float[] measure) {
+        this.measure.put(clusterId, measure);
     }
     
-    public void resetPPR() {
-        this.ppr.clear();
+    public void resetMeasure() {
+        this.measure.clear();
     }    
 
 //    public Object getProcessingDummy() {

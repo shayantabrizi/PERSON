@@ -5,7 +5,6 @@
  */
 package ir.ac.ut.iis.person;
 
-import static ir.ac.ut.iis.person.Configs.datasetName;
 import static ir.ac.ut.iis.person.Main.outputPath;
 import static ir.ac.ut.iis.person.Main.retriever;
 import ir.ac.ut.iis.person.algorithms.aggregate.AggregateSearcher;
@@ -14,31 +13,32 @@ import ir.ac.ut.iis.person.algorithms.campos.HRR;
 import ir.ac.ut.iis.person.algorithms.campos.IHRR;
 import ir.ac.ut.iis.person.algorithms.campos.IRR;
 import ir.ac.ut.iis.person.algorithms.campos.SRR;
-import ir.ac.ut.iis.person.algorithms.social_textual.citeseerx.CiteseerxSocialTextualValueSource;
 import ir.ac.ut.iis.person.algorithms.queries.MyLMQuery;
 import ir.ac.ut.iis.person.algorithms.queries.MyWeiQuery;
 import ir.ac.ut.iis.person.algorithms.searchers.BasicSearcher;
 import ir.ac.ut.iis.person.algorithms.searchers.FeedbackExpander;
 import ir.ac.ut.iis.person.algorithms.searchers.RandomSearcher;
 import ir.ac.ut.iis.person.algorithms.searchers.SocialSearcher;
-import ir.ac.ut.iis.person.baselines.Binary_Log_Yes;
+import ir.ac.ut.iis.person.algorithms.social_textual.citeseerx.CiteseerxSocialTextualValueSource;
 import ir.ac.ut.iis.person.baselines.Binary_Log_No;
-import ir.ac.ut.iis.person.baselines.Binary_No_Yes;
+import ir.ac.ut.iis.person.baselines.Binary_Log_Yes;
 import ir.ac.ut.iis.person.baselines.Binary_No_No;
-import ir.ac.ut.iis.person.baselines.Log_Log_Yes;
+import ir.ac.ut.iis.person.baselines.Binary_No_Yes;
 import ir.ac.ut.iis.person.baselines.Log_Log_No;
-import ir.ac.ut.iis.person.baselines.Log_No_Yes;
+import ir.ac.ut.iis.person.baselines.Log_Log_Yes;
 import ir.ac.ut.iis.person.baselines.Log_No_No;
-import ir.ac.ut.iis.person.baselines.Raw_Log_Yes;
+import ir.ac.ut.iis.person.baselines.Log_No_Yes;
 import ir.ac.ut.iis.person.baselines.Raw_Log_No;
-import ir.ac.ut.iis.person.baselines.Raw_No_Yes;
+import ir.ac.ut.iis.person.baselines.Raw_Log_Yes;
 import ir.ac.ut.iis.person.baselines.Raw_No_No;
+import ir.ac.ut.iis.person.baselines.Raw_No_Yes;
 import ir.ac.ut.iis.person.myretrieval.MyDummySimilarity;
 import ir.ac.ut.iis.person.paper.TopicsReader;
 import ir.ac.ut.iis.person.query.NormalizedQueryExpander;
 import ir.ac.ut.iis.person.query.QueryConverter;
 import ir.ac.ut.iis.person.query.QueryExpander;
 import ir.ac.ut.iis.person.topics.InstanceClassifier;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 
@@ -85,7 +85,6 @@ public class AddSearchers {
 //        retriever.addSearcher(baselineSearcher9);
 //        final BasicSearcher baselineSearcher10 = new BasicSearcher(DatasetMain.getInstance().getIndexSearcher(), "02-MyLM-200", new MyDummySimilarity(Configs.lmDirichletMu, new MyLMQuery(200)), queryConverter);
 //        retriever.addSearcher(baselineSearcher10);
-
 //                addAggregateSearchers(baseSimilarity, queryConverter);
 //                addClusterBasedSearchers(baseSimilarity, queryConverter);
 //                addOtherSearchers(baseSimilarity, queryConverter);
@@ -104,19 +103,19 @@ public class AddSearchers {
     }
 
     private static Similarity baseSimilarity() {
-        Similarity baseSimilarity;
+        Similarity bs;
         switch (Configs.baseSimilarityName) {
             case "LM":
-                baseSimilarity = new LMDirichletSimilarity(Configs.lmDirichletMu);
+                bs = new LMDirichletSimilarity(Configs.lmDirichletMu);
                 break;
             case "MyLM":
-                baseSimilarity = new MyDummySimilarity(Configs.lmDirichletMu, new MyLMQuery((Configs.lmDirichletMu)));
+                bs = new MyDummySimilarity(Configs.lmDirichletMu, new MyLMQuery((Configs.lmDirichletMu)));
                 break;
             default:
-                baseSimilarity = new Log_Log_Yes();
+                bs = new Log_Log_Yes();
                 break;
         }
-        return baseSimilarity;
+        return bs;
     }
 
     public static void addTopicSearchers() {

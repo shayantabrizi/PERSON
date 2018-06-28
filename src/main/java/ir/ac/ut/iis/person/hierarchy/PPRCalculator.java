@@ -11,13 +11,16 @@ import ir.ac.ut.iis.person.Configs;
  *
  * @author shayan
  */
-public abstract class PPRCalculator {
+public abstract class PPRCalculator implements MeasureCalculator {
 
     protected final int topicNodeId;
+    protected final double alpha;
 
-    public PPRCalculator(int topicNodeId) {
+    public PPRCalculator(int topicNodeId, double alpha) {
         this.topicNodeId = topicNodeId;
+        this.alpha = alpha;
     }
+
 
     public int getTopicNodeId() {
         return topicNodeId;
@@ -25,6 +28,7 @@ public abstract class PPRCalculator {
 
     protected abstract void updatePPRs(float[] zeroDegrees, double alpha);
 
+    @Override
     public abstract String toString();
 
     @Override
@@ -33,8 +37,9 @@ public abstract class PPRCalculator {
     @Override
     public abstract boolean equals(Object obj);
 
-    public float[] PPR(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level, double alpha) {
-        float[] get = node.getPPR(this);
+    @Override
+    public float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level) {
+        float[] get = node.getMeasure(this);
         if (get != null) {
             return get;
         }
@@ -60,7 +65,7 @@ public abstract class PPRCalculator {
                 arr[i] = 1.f / parentSize;
                 tmp[i] = 0;
             }
-            u.addPPR(this, arr);
+            u.addMeasure(this, arr);
             u.setTmpPPR(tmp);
         }
         //        for (User u : topic) {
@@ -89,7 +94,7 @@ public abstract class PPRCalculator {
             float[] zeroDegrees = new float[numOfWeights];
             for (GraphNode u : parent) {
                 float[] degree = u.getDegree(level);
-                float[] ppr = u.getPPR(this);
+                float[] ppr = u.getMeasure(this);
                 for (int i = 0; i < numOfWeights; i++) {
                     if (degree[i] == 0.) {
                         zeroDegrees[i] += ppr[i];
@@ -114,7 +119,7 @@ public abstract class PPRCalculator {
             }
             //            double sum = 0;
             for (GraphNode u : parent) {
-                final float[] ppr = u.getPPR(this);
+                final float[] ppr = u.getMeasure(this);
                 for (int i = 0; i < numOfWeights; i++) {
                     float abs = Math.abs(u.getTmpPPR()[i] - ppr[i]);
                     diff[i] = Math.max(diff[i], abs);
@@ -126,7 +131,7 @@ public abstract class PPRCalculator {
             //            System.out.println(sum);
         }
         System.out.println("PPR: " + this);
-        return node.getPPR(this);
+        return node.getMeasure(this);
     }
 
 }

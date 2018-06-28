@@ -34,17 +34,21 @@ public class MyCustomScoreProvider extends CustomScoreProvider {
         valSrcScore.initialize();
     }
 
-    public static void printStatistics() {
-        statistics.printStatistics();
+    public static void printStatistics(boolean verbose) {
+        statistics.printStatistics(verbose);
     }
 
     private final float personalizationWeight;
     private final float textualWeight;
+    private final boolean powTextual;
+    private final float normalizationFactor;
 
-    public MyCustomScoreProvider(LeafReaderContext context, float personalizationWeight, float textualWeight) {
+    public MyCustomScoreProvider(LeafReaderContext context, float personalizationWeight, float textualWeight, boolean powTextual, float normalizationFactor) {
         super(context);
         this.personalizationWeight = personalizationWeight;
         this.textualWeight = textualWeight;
+        this.powTextual = powTextual;
+        this.normalizationFactor = normalizationFactor;
     }
 
     @Override
@@ -65,6 +69,13 @@ public class MyCustomScoreProvider extends CustomScoreProvider {
 //            throw new RuntimeException();
 //        }
 //        final double pow = Math.pow(Math.E, subQueryScore);
+
+        if (powTextual) {
+            subQueryScore = (float) Math.pow(Math.E, subQueryScore);
+        }
+        if (normalizationFactor != 0f) {
+            subQueryScore *= normalizationFactor;
+        }
         MyCustomScoreProvider.subQueryScore.add(subQueryScore);
         MyCustomScoreProvider.valSrcScore.add(valSrcScore);
         MyCustomScoreProvider.allSubQueryScore.add(subQueryScore);

@@ -67,7 +67,7 @@ public abstract class Retriever implements Closeable {
             for (Searcher s : searchers) {
                 System.out.println(s.getName());
                 createQueryAndSearch(queries, s);
-                MyCustomScoreProvider.printStatistics();
+                MyCustomScoreProvider.printStatistics(false);
                 MyCustomScoreProvider.resetStatistics();
 //                if (entry.getValue().size() < Main.numOfResults) {
 //                    throw new IgnoreQueryEx("small resultset: " + s.getName() + ": " + entry.getValue().size());

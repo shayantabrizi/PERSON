@@ -238,7 +238,7 @@ public class HierarchyNode {
     }
 
     public float[] selfPPR() {
-        return selfPPR(new UniformPPR(id, getUsers(), usersNum()));
+        return selfPPR(new UniformPPR(id, getUsers(), usersNum(), Configs.pagerankAlpha));
     }
 
     public float[] selfPPR(PPRCalculator pprCalculator) {
@@ -313,7 +313,7 @@ public class HierarchyNode {
     }
 
     public float[] userPPR(GraphNode node) {
-        return userPPR(new UniformPPR(id, getUsers(), usersNum()), node);
+        return userPPR(new UniformPPR(id, getUsers(), usersNum(), Configs.pagerankAlpha), node);
     }
 
     public float[] userPPR(PPRCalculator pprCalculator, GraphNode node) {
@@ -325,7 +325,7 @@ public class HierarchyNode {
 //            System.out.println("");
             throw new IgnoreQueryEx();
         }
-        final float[] PPR = pprCalculator.PPR(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level, Configs.pagerankAlpha);
+        final float[] PPR = pprCalculator.calc(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level);
 //        System.out.println(PPR[0]);
         return PPR;
     }

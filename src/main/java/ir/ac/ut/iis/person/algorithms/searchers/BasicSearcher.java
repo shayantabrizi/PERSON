@@ -38,7 +38,7 @@ import org.apache.lucene.search.similarities.Similarity;
  */
 public class BasicSearcher extends Searcher {
 
-    private final IndexSearcher searcher;
+    protected final IndexSearcher searcher;
     private final StandardQueryParser parser;
     private final Similarity similarity;
     private FeedbackExpander fe;

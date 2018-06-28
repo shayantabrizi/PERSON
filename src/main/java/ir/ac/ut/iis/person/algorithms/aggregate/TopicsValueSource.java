@@ -69,7 +69,7 @@ public class TopicsValueSource extends MyValueSource implements Closeable {
 
     @Override
     public void initialize(Query query) {
-        statistics.printStatistics();
+        statistics.printStatistics(false);
         for (TopicAlgorithm ta : algorithms) {
             ta.initialize(query);
         }
