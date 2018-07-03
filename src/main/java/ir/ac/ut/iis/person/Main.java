@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author GOMROK IRAN
+ * @author Shayan
  */
 public class Main {
 
@@ -51,27 +51,33 @@ public class Main {
         Configs.ndcgAt = 50;
         Configs.useTFIDFWeightingInCampos = false;
         Configs.onlyQueriesWhoseAuthorHasMoreThan_THIS_Papers = 1;
-        new PapersMain().main("Cam");
-        AddSearchers.addBaseline();
-        AddSearchers.addAllCamposSearchers("");
-        retrieve();
+        try (PapersMain main = new PapersMain()) {
+            main.main("Cam");
+            AddSearchers.addBaseline();
+            AddSearchers.addAllCamposSearchers("");
+            retrieve();
+        }
     }
 
     public static void expAxioms() {
-        new PapersMain().main("A");
-        AddSearchers.addAxiomSearchers();
-        retrieve();
+        try (PapersMain main = new PapersMain()) {
+            main.main("A");
+            AddSearchers.addAxiomSearchers();
+            retrieve();
+        }
     }
 
     public static void expMoreAxioms() {
         Configs.baseSimilarityName = "MyLM";
         Configs.lmDirichletMu = 400;
         AddSearchers.reinitialize();
-        new PapersMain().main("MA");
-        AddSearchers.addBaseline();
-        AddSearchers.addFeedbackSearchers();
-        AddSearchers.addTopicSearchers();
-        retrieve();
+        try (PapersMain main = new PapersMain()) {
+            main.main("MA");
+            AddSearchers.addBaseline();
+            AddSearchers.addFeedbackSearchers();
+            AddSearchers.addTopicSearchers();
+            retrieve();
+        }
     }
 
     public static void expCamposTau() {
@@ -86,18 +92,22 @@ public class Main {
 
     public static void expCompare() {
         Configs.onlyQueriesWhoseAuthorHasMoreThan_THIS_Papers = 1;
-        new PapersMain().main("C");
-        AddSearchers.addBaseline();
-        AddSearchers.addOtherSearchers();
-        AddSearchers.addAggregateSearchers(false);
-        retrieve();
+        try (PapersMain main = new PapersMain()) {
+            main.main("C");
+            AddSearchers.addBaseline();
+            AddSearchers.addOtherSearchers();
+            AddSearchers.addAggregateSearchers(false);
+            retrieve();
+        }
     }
 
     public static void expRobustness() {
-        new PapersMain().main("R");
-        AddSearchers.addBaseline();
-        AddSearchers.addAggregateSearchers(true);
-        retrieve();
+        try (PapersMain main = new PapersMain()) {
+            main.main("R");
+            AddSearchers.addBaseline();
+            AddSearchers.addAggregateSearchers(true);
+            retrieve();
+        }
     }
 
     public static Integer random(int max) {
@@ -155,7 +165,9 @@ public class Main {
             Configs.topicsName = topicsName;
         }
         Configs.runStage = runStage;
-        new PapersMain().main("Ind");
+        try (PapersMain main = new PapersMain()) {
+            main.main("Ind");
+        }
     }
 
 }

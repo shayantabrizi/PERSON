@@ -23,7 +23,7 @@ import org.apache.lucene.queries.function.FunctionValues;
  *
  * @author shayan
  */
-public abstract class UserBasedValueSource extends MyValueSource implements Closeable{
+public abstract class UserBasedValueSource extends MyValueSource implements Closeable {
 
     protected final Connection conn;
     private Map<Integer, Double> map;
@@ -52,7 +52,6 @@ public abstract class UserBasedValueSource extends MyValueSource implements Clos
             @Override
             public float floatVal(int doc) {
                 Double get1 = map.get(readerContext.docBase + doc);
-//                System.out.println(get1);
                 if (get1 == null) {
                     return 0;
                 }
@@ -81,7 +80,7 @@ public abstract class UserBasedValueSource extends MyValueSource implements Clos
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public abstract HashMap calcWeights(int userId, int degree);
+    public abstract HashMap<Integer, Double> calcWeights(int userId, int degree);
 
     @Override
     public void close() throws IOException {
