@@ -38,6 +38,7 @@ import ir.ac.ut.iis.person.query.NormalizedQueryExpander;
 import ir.ac.ut.iis.person.query.QueryConverter;
 import ir.ac.ut.iis.person.query.QueryExpander;
 import ir.ac.ut.iis.person.topics.InstanceClassifier;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 
@@ -257,7 +258,7 @@ public class AddSearchers {
         outputPath += "," + Configs.socialTextualParameters();
 
 //        Map<Integer, Integer> docIdMap = generateDocIdMap(hiers[0].getRootNode().getSearcher().getIndexReader());
-        MyValueSource myValueSource = new CiteseerxSocialTextualValueSource(Configs.database_name);
+        MyValueSource myValueSource = new CiteseerxSocialTextualValueSource(Configs.database_name, .09);
 //                MyValueSource myValueSourceNoPenalization = new CiteseerxSocialTextualValueSource(database_name, docIdMap);
 //                ((CiteseerxSocialTextualValueSource) myValueSourceNoPenalization).setPenalizeMultipleAuthors(false);
 //                MyValueSource myValueSourceNoUseUserWeight = new CiteseerxSocialTextualValueSource(database_name, docIdMap);
@@ -276,11 +277,11 @@ public class AddSearchers {
 //        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.55", baseSimilarity, queryConverter, .55f, .45f));
 //        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.65", baseSimilarity, queryConverter, .65f, .35f));
         if (all) {
-            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.70", baseSimilarity, queryConverter, .70f, .30f));
-            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.75", baseSimilarity, queryConverter, .75f, .25f));
-            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.80", baseSimilarity, queryConverter, .80f, .20f));
+            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .85f, .15f));
+            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .75f, .25f));
+            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .7f, .3f));
         }
-        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.85", baseSimilarity, queryConverter, .85f, .15f));
+        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .8f, .2f));
 //                retriever.addSearcher(new AggregateSearcher(myValueSourceNoPenalization, hiers[0].getRootNode().getSearcher(), "AggregateTFIDF-.25-myValueSourceNoPenalization", new DefaultSimilarity(), queryConverter, .25f, .75f, docIdMap));
 //                retriever.addSearcher(new AggregateSearcher(myValueSourceNoUseUserWeight, hiers[0].getRootNode().getSearcher(), "AggregateTFIDF-.25-myValueSourceNoUseUserWeight", new DefaultSimilarity(), queryConverter, .25f, .75f, docIdMap));
 //                retriever.addSearcher(new AggregateSearcher(myValueSourceNoUseFriendWeight, hiers[0].getRootNode().getSearcher(), "AggregateTFIDF-.25-myValueSourceNoUseFriendWeight", new DefaultSimilarity(), queryConverter, .25f, .75f, docIdMap));
