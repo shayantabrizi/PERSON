@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class LastFMSocialTextualValueSource extends UserBasedValueSource {
 
-    HashMap<Integer, Double> userWeights = new HashMap();
+    HashMap<Integer, Double> userWeights = new HashMap<>();
     final int MAX_USER_DEGREE = 26;  //max number of neighbours
 
     public LastFMSocialTextualValueSource(String database_name) {
@@ -29,25 +29,25 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
 
     //weights calculated using SN (social network) of the user
     @Override
-    public HashMap calcWeights(int userId, int degree) {
+    public HashMap<Integer, Double> calcWeights(int userId, int degree) {
 
-        HashMap utSNMap = new HashMap();//(trackid, weight)
+        HashMap<Integer, Double> utSNMap = new HashMap<>();//(trackid, weight)
 
-        HashMap uuMap;
+        HashMap<Integer, Integer> uuMap;
         uuMap = getFriends(userId, degree);
-        Set set = uuMap.entrySet();
-        Iterator i = set.iterator();
+        Set<Map.Entry<Integer, Integer>> set = uuMap.entrySet();
+        Iterator<Map.Entry<Integer, Integer>> i = set.iterator();
         while (i.hasNext()) {
-            Map.Entry me = (Map.Entry) i.next();
+            Map.Entry<Integer, Integer> me = i.next();
             int friendId = ((Number) me.getKey()).intValue();
             double friendWeight = 1.0 / ((Number) me.getValue()).intValue();
-            HashMap utMap; //tracks for this friend
+            HashMap<Integer, Double> utMap; //tracks for this friend
             utMap = userTrackWeightSimple(friendId);
             //iterate through tracks (docs) for this friend
-            Set tracksSet = utMap.entrySet();
-            Iterator j = tracksSet.iterator();
+            Set<Map.Entry<Integer, Double>> tracksSet = utMap.entrySet();
+            Iterator<Map.Entry<Integer, Double>> j = tracksSet.iterator();
             while (j.hasNext()) {
-                Map.Entry me2 = (Map.Entry) j.next();
+                Map.Entry<Integer, Double> me2 = j.next();
                 double trackWeight = ((Number) me2.getValue()).doubleValue(); //normalize?
 
                 Double tt = userWeights.get(friendId);
@@ -72,13 +72,13 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
         return utSNMap;
     }//userTrackWeightSN
 
-    public HashMap getFriends(int userId, int degree) {
+    public HashMap<Integer, Integer> getFriends(int userId, int degree) {
 
         String query;
         Statement stmt;
         ResultSet rs;
 
-        HashMap uuMap = new HashMap();
+        HashMap<Integer, Integer> uuMap = new HashMap<>();
 
         if (degree == 1) {
 
@@ -166,19 +166,19 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
         //writing the final set
 //        System.out.println("-------friends for user " + userId + " , degree = " + degree + "---------");
         uuMap.remove(userId);
-        Set set = uuMap.entrySet();
-        Iterator i = set.iterator();
+        Set<Map.Entry<Integer, Integer>> set = uuMap.entrySet();
+        Iterator<Map.Entry<Integer, Integer>> i = set.iterator();
         while (i.hasNext()) {
-            Map.Entry me = (Map.Entry) i.next();
+            Map.Entry<Integer, Integer> me = i.next();
             //           System.out.println(me.getKey() + " : " + me.getValue());
         }
         return uuMap;
     }//getFriends
 
     //put them in hashmao to simulate inverted lists (instead of user,track -> score)
-    public HashMap userTrackWeightSimple(int userId) {
+    public HashMap<Integer, Double> userTrackWeightSimple(int userId) {
 
-        HashMap utMap = new HashMap();
+        HashMap<Integer, Double> utMap = new HashMap<>();
         String query = "select distinct track_id,playcount from small_user_track where user_id =" + userId + " order by playcount desc";
 
         Statement stmt;
@@ -211,10 +211,10 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
 
         //writing the final set
 //        System.out.println("-------tracks for user " + userId + "---------");
-        Set set = utMap.entrySet();
-        Iterator i = set.iterator();
+        Set<Map.Entry<Integer, Double>> set = utMap.entrySet();
+        Iterator<Map.Entry<Integer, Double>> i = set.iterator();
         while (i.hasNext()) {
-            Map.Entry me = (Map.Entry) i.next();
+            Map.Entry<Integer, Double> me = i.next();
 //            System.out.println(me.getKey() + " : " + me.getValue());
         }
         return utMap;
@@ -424,5 +424,10 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
         return Math.log(1 + getTagTrackWight(trackId, tag));
 
     }//getTagTrackWight
+
+    @Override
+    public String getName() {
+        return "SocialTextual";
+    }
 
 }

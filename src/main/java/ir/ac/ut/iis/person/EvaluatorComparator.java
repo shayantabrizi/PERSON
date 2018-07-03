@@ -218,12 +218,14 @@ public class EvaluatorComparator {
     }
 
     protected Pair<Map<String, ResultConverter.Stats>, Map<String, Map<String, Double>>> tauTempAcrossCampos(String prefix, boolean self) {
-        new PapersMain().main(prefix, outputFolder + Configs.evaluator.getName());
-        this.retriever = Main.retriever;
-        AddSearchers.addBaseline();
-        AddSearchers.addAllCamposSearchers(prefix);
-        Main.retrieve();
-        return calcStats();
+        try (PapersMain main = new PapersMain()) {
+            main.main(prefix, outputFolder + Configs.evaluator.getName());
+            this.retriever = Main.retriever;
+            AddSearchers.addBaseline();
+            AddSearchers.addAllCamposSearchers(prefix);
+            Main.retrieve();
+            return calcStats();
+        }
     }
 
     protected Pair<Map<String, ResultConverter.Stats>, Map<String, Map<String, Double>>> calcStats() throws NumberFormatException {
@@ -233,51 +235,55 @@ public class EvaluatorComparator {
     }
 
     protected Pair<Map<String, ResultConverter.Stats>, Map<String, Map<String, Double>>> tauTempAcrossMethods(String prefix, int k, double p0, boolean self) {
-        new PapersMain().main(prefix, outputFolder + Configs.evaluator.getName() + "_k=" + k + "_p0=" + p0);
-        this.retriever = Main.retriever;
-        AddSearchers.addBaseline();
-        AddSearchers.addCamposSearchers(k, prefix + k + "_" + p0 + "_", p0);
-        Main.retrieve();
-        return calcStats();
+        try (PapersMain main = new PapersMain()) {
+            main.main(prefix, outputFolder + Configs.evaluator.getName() + "_k=" + k + "_p0=" + p0);
+            this.retriever = Main.retriever;
+            AddSearchers.addBaseline();
+            AddSearchers.addCamposSearchers(k, prefix + k + "_" + p0 + "_", p0);
+            Main.retrieve();
+            return calcStats();
+        }
     }
 
     protected Pair<Map<String, ResultConverter.Stats>, Map<String, Map<String, Double>>> tauTempAcrossProfiles(String prefix, String method, boolean self) {
-        new PapersMain().main(prefix, outputFolder + Configs.evaluator.getName() + "_method=" + method);
-        this.retriever = Main.retriever;
-        AddSearchers.addBaseline();
-        int[] k = {5, 10, 20, 40};
-        double[] p0 = {.33, .66, .99};
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 3; j++) {
-                NormalizedQueryExpander normalizedQueryExpander = new NormalizedQueryExpander(k[i], Configs.evaluator, p0[j]);
-                switch (method) {
-                    case "QE":
-                        QueryExpander queryExpander = new QueryExpander(k[i], Configs.evaluator);
-                        retriever.addSearcher(new BasicSearcher(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_1_QE", AddSearchers.getBaseSimilarity(), queryExpander));
-                        break;
-                    case "NQE":
-                        retriever.addSearcher(new BasicSearcher(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_2_NQE", AddSearchers.getBaseSimilarity(), normalizedQueryExpander));
-                        break;
-                    case "HRR":
-                    case "SRR":
-                    case "IRR":
-                    case "IHRR":
-                        try {
-                            retriever.addSearcher((Searcher) Class.forName("ir.ac.ut.iis.taval.algorithms.campos." + method).getConstructors()[0].newInstance(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_3_" + method, AddSearchers.getBaseSimilarity(), AddSearchers.getQueryConverter(), normalizedQueryExpander));
-                        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                            throw new RuntimeException();
-                        }
-                        break;
-                    case "PHRR":
-                        NormalizedQueryExpander normalizedQueryExpanderOriginalIgnored = new NormalizedQueryExpander(DatasetMain.getInstance().getIndexSearcher(), k[i], Configs.evaluator, p0[j], true);
-                        retriever.addSearcher(new HRR(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_7_PHRR", AddSearchers.getBaseSimilarity(), AddSearchers.getQueryConverter(), normalizedQueryExpanderOriginalIgnored));
-                        break;
+        try (PapersMain main = new PapersMain()) {
+            main.main(prefix, outputFolder + Configs.evaluator.getName() + "_method=" + method);
+            this.retriever = Main.retriever;
+            AddSearchers.addBaseline();
+            int[] k = {5, 10, 20, 40};
+            double[] p0 = {.33, .66, .99};
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 3; j++) {
+                    NormalizedQueryExpander normalizedQueryExpander = new NormalizedQueryExpander(k[i], Configs.evaluator, p0[j]);
+                    switch (method) {
+                        case "QE":
+                            QueryExpander queryExpander = new QueryExpander(k[i], Configs.evaluator);
+                            retriever.addSearcher(new BasicSearcher(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_1_QE", AddSearchers.getBaseSimilarity(), queryExpander));
+                            break;
+                        case "NQE":
+                            retriever.addSearcher(new BasicSearcher(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_2_NQE", AddSearchers.getBaseSimilarity(), normalizedQueryExpander));
+                            break;
+                        case "HRR":
+                        case "SRR":
+                        case "IRR":
+                        case "IHRR":
+                            try {
+                                retriever.addSearcher((Searcher) Class.forName("ir.ac.ut.iis.taval.algorithms.campos." + method).getConstructors()[0].newInstance(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_3_" + method, AddSearchers.getBaseSimilarity(), AddSearchers.getQueryConverter(), normalizedQueryExpander));
+                            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                throw new RuntimeException();
+                            }
+                            break;
+                        case "PHRR":
+                            NormalizedQueryExpander normalizedQueryExpanderOriginalIgnored = new NormalizedQueryExpander(DatasetMain.getInstance().getIndexSearcher(), k[i], Configs.evaluator, p0[j], true);
+                            retriever.addSearcher(new HRR(DatasetMain.getInstance().getIndexSearcher(), prefix + k[i] + "_" + p0[j] + "_7_PHRR", AddSearchers.getBaseSimilarity(), AddSearchers.getQueryConverter(), normalizedQueryExpanderOriginalIgnored));
+                            break;
+                    }
                 }
             }
+            Main.retrieve();
+            return calcStats();
         }
-        Main.retrieve();
-        return calcStats();
     }
 
 }

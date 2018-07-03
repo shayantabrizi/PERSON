@@ -59,14 +59,6 @@ public class TopicsValueSource extends MyValueSource implements Closeable {
         }
     }
 
-    public String getParamsString() {
-        StringBuilder sb = new StringBuilder();
-        for (TopicAlgorithm ta : algorithms) {
-            sb.append(ta.getName()).append("=").append(ta.getWeight()).append(",");
-        }
-        return sb.toString();
-    }
-
     @Override
     public void initialize(Query query) {
         statistics.printStatistics(false);
@@ -224,6 +216,15 @@ public class TopicsValueSource extends MyValueSource implements Closeable {
             Logger.getLogger(TopicsValueSource.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException();
         }
+    }
+
+    @Override
+    public String getName() {
+        StringBuilder sb = new StringBuilder("TopicsVS-");
+        for (TopicAlgorithm ta : algorithms) {
+            sb.append(ta.getName()).append("=").append(ta.getWeight()).append(",");
+        }
+        return sb.toString();
     }
 
     private static class TopicsCache {

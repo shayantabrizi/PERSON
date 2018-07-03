@@ -35,7 +35,9 @@ public class AggregateSearcher extends BasicSearcher {
     }
 
     public AggregateSearcher(MyValueSource vs, IndexSearcher searcher, String name, Similarity similarity, QueryConverter queryConverter, float personalizationWeight, float textualWeight, boolean powTextual, boolean normalizeTextualWeight) {
-        super(searcher, name, similarity, queryConverter);
+        super(searcher, name + "-(" + ((personalizationWeight + textualWeight == 1.f) ? personalizationWeight : personalizationWeight + "," + textualWeight)
+                + (powTextual ? ",PW" : "") + (normalizeTextualWeight ? ",NT" : "") + ")",
+                similarity, queryConverter);
         this.personalizationWeight = personalizationWeight;
         this.textualWeight = textualWeight;
         this.vs = vs;

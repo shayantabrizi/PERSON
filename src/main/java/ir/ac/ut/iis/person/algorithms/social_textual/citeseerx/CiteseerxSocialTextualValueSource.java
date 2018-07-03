@@ -24,7 +24,7 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
     private final boolean useFriendWeight = true;
     private final double selfConsiderConstant;
 
-    HashMap<Integer, Double> userWeights = new HashMap();
+    HashMap<Integer, Double> userWeights = new HashMap<>();
     final int MAX_USER_DEGREE = 100;  //max number of neighbours
 
     public CiteseerxSocialTextualValueSource(String database_name) {
@@ -40,9 +40,9 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
     @Override
     public HashMap<Integer, Double> calcWeights(int userId, int degree) {
 
-        HashMap utSNMap = new HashMap();//(trackid, weight)
+        HashMap<Integer, Double> utSNMap = new HashMap<>();//(trackid, weight)
 
-        HashMap uuMap;
+        HashMap<Integer, Double> uuMap;
 //        uuMap = getFriends(Main.random(500000), degree);
 //        while (uuMap.size() < 50) {
 //            uuMap = getFriends(Main.random(500000), degree);
@@ -52,25 +52,28 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
 //            throw new IgnoreQueryEx("Not enough friends to personalize: " + uuMap.size());
 //        }
 //        System.out.println("Friends size: " + uuMap.size());
-        Set set = uuMap.entrySet();
-        Iterator i = set.iterator();
+        Set<Map.Entry<Integer, Double>> set = uuMap.entrySet();
+        Iterator<Map.Entry<Integer, Double>> i = set.iterator();
         Map<Integer, QueryResult> userTrackWeightSimple = userTrackWeightSimple(uuMap.keySet());
         while (i.hasNext()) {
-            Map.Entry me = (Map.Entry) i.next();
-            int friendId = ((Number) me.getKey()).intValue();
+            Map.Entry<Integer, Double> me = i.next();
+            int friendId = me.getKey();
             QueryResult uMap = userTrackWeightSimple.get(friendId);
             double friendWeight = 1;
             if (useFriendWeight) {
-                friendWeight = 1.0 / ((Number) me.getValue()).doubleValue();
+                friendWeight = 1.0 / me.getValue();
             }
-            Map utMap; //tracks for this friend
+            if (friendWeight > 1.) {
+                System.out.println("");
+            }
+            Map<Integer, Double> utMap; //tracks for this friend
             utMap = uMap.map;
             //iterate through tracks (docs) for this friend
-            Set tracksSet = utMap.entrySet();
-            Iterator j = tracksSet.iterator();
+            Set<Map.Entry<Integer, Double>> tracksSet = utMap.entrySet(); 
+            Iterator<Map.Entry<Integer, Double>> j = tracksSet.iterator();
             while (j.hasNext()) {
-                Map.Entry me2 = (Map.Entry) j.next();
-                double trackWeight = ((Number) me2.getValue()).doubleValue(); //normalize?
+                Map.Entry<Integer, Double> me2 = j.next();
+                double trackWeight = me2.getValue(); //normalize?
                 double userWeight = uMap.friendsCoauthors;
                 userWeight /= MAX_USER_DEGREE;
                 userWeight = Math.min(userWeight, 1);
@@ -79,7 +82,7 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
                 double weight = trackWeight * friendWeight * tt; //check!
                 double newWeight = -1;
                 if (utSNMap.containsKey(me2.getKey())) { //already in SN hashMap
-                    double oldWeight = ((Number) utSNMap.get(me2.getKey())).doubleValue();
+                    double oldWeight = me2.getKey();
                     newWeight = oldWeight + weight;
                 } else {  //first time we see this track
                     newWeight = weight;
@@ -98,13 +101,13 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
         return utSNMap;
     }//userTrackWeightSN
 
-    public HashMap getFriends(int userId, int degree) {
+    public HashMap<Integer, Double> getFriends(int userId, int degree) {
 
         String query;
         Statement stmt;
         ResultSet rs;
 
-        HashMap uuMap = new HashMap();
+        HashMap<Integer, Double> uuMap = new HashMap<>();
 
         if (degree == 2) {
 
@@ -119,12 +122,12 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
                 while (rs.next()) {
                     value = rs.getInt(1);
                     //System.out.println(value + ",1");
-                    uuMap.put(value, 1);
+                    uuMap.put(value, 1.);
 
                     value = rs.getInt(2);
                     //System.out.println(value + ",2");
                     if (!uuMap.containsKey(value)) {
-                        uuMap.put(value, 2);
+                        uuMap.put(value, 2.);
                     }
                 } //end while
                 stmt.close();
@@ -147,19 +150,19 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
                 while (rs.next()) {
                     value = rs.getInt(1);
                     //                  System.out.println(value + ",1");
-                    uuMap.put(value, 1);
+                    uuMap.put(value, 1.);
 
                     value = rs.getInt(2);
-                    final Object get = uuMap.get(value);
+                    final Double get = uuMap.get(value);
                     //                System.out.println(value + ",2");
-                    if (get == null || ((Number) get).intValue() == 3) {
-                        uuMap.put(value, 2);
+                    if (get == null || get == 3.) {
+                        uuMap.put(value, 2.);
                     }
 
                     value = rs.getInt(3);
                     //              System.out.println(value + ",3");
                     if (!uuMap.containsKey(value)) {
-                        uuMap.put(value, 3);
+                        uuMap.put(value, 3.);
                     }
                 } //end while
                 stmt.close();
@@ -181,7 +184,7 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
 
     public QueryResult userTrackWeightSimple(int userId) {
 
-        HashMap utMap = new HashMap();
+        HashMap<Integer, Double> utMap = new HashMap<>();
         String query = "select paperId,numOfAuthors,numberOfAuthorsCoauthors from UserPapers where uid =" + userId;
 
         Statement stmt;
@@ -234,7 +237,7 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
                 final int uid = rs.getInt(1);
                 QueryResult get = map.get(uid);
                 if (get == null) {
-                    get = new QueryResult(new HashMap(), rs.getInt(4));
+                    get = new QueryResult(new HashMap<>(), rs.getInt(4));
                     map.put(uid, get);
                 }
                 int id, numOfAuthors;
@@ -284,12 +287,17 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
         return Math.log(1 + weight);
     }//getUSerWeight
 
+    @Override
+    public String getName() {
+        return "SocialTextual-" + selfConsiderConstant;
+    }
+
     public static class QueryResult {
 
-        public Map map;
+        public Map<Integer, Double> map;
         public Integer friendsCoauthors;
 
-        public QueryResult(Map map, Integer friendsCoauthors) {
+        public QueryResult(Map<Integer, Double> map, Integer friendsCoauthors) {
             this.map = map;
             this.friendsCoauthors = friendsCoauthors;
         }

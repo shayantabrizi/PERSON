@@ -16,12 +16,12 @@ import java.util.List;
  *
  * @author Shayan
  */
-public class CiteseerxPreprocessor implements IterableToFiles<List> {
+public class CiteseerxPreprocessor implements IterableToFiles<List<?>> {
 
     PapersPreprocessor pp = new PapersPreprocessor(new DisambiguatedAuthorFactory());
 
     @Override
-    public boolean doAction(final File fileEntry, final List records) {
+    public boolean doAction(final File fileEntry, final List<?> records) {
         for (Object o : records) {
             pp.processPaper(o);
         }

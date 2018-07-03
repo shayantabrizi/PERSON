@@ -167,10 +167,15 @@ public abstract class DatasetMain implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (hiers != null) {
             for (Hierarchy hier : hiers) {
-                hier.getRootNode().close();
+                try {
+                    hier.getRootNode().close();
+                } catch (IOException ex) {
+                    Logger.getLogger(DatasetMain.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new RuntimeException();
+                }
             }
         }
     }

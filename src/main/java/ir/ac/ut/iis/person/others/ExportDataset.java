@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * @author shayan
  */
 public class ExportDataset {
-    
+
     public static void main(String[] args) {
         try (Writer export = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(Configs.datasetRoot + "docs-mallet.txt")))) {
             final DocumentExporter exporter = new DocumentExporter(export);
@@ -41,21 +41,20 @@ public class ExportDataset {
             throw new RuntimeException();
         }
     }
-    
+
     private static class AuthorExporter implements MyIterable<ir.ac.ut.iis.retrieval_tools.papers.BasePaper> {
-        
+
         private int count = 0;
         private final Map<Integer, StringBuilder> map = new HashMap<>();
-        protected static final org.apache.lucene.analysis.Analyzer analyzer = new DatasetMain.MyAnalyzer();
-        
+
         @Override
         public boolean doAction(ir.ac.ut.iis.retrieval_tools.papers.BasePaper p) {
             if (count % 10_000 == 0) {
                 System.out.println(count + " " + new Date());
             }
-            
+
             String text = p.getTitle() + " " + p.getAbs();
-            
+
             List<String> tokenizeString = PapersRetriever.tokenizeString(text);
             StringBuilder sb = new StringBuilder();
             for (String s : tokenizeString) {
@@ -69,11 +68,11 @@ public class ExportDataset {
                 }
                 get.append(" ").append(sb);
             }
-            
+
             count++;
             return true;
         }
-        
+
         public void writeAuthors(Writer writer) {
             for (Map.Entry<Integer, StringBuilder> e : map.entrySet()) {
                 try {
@@ -86,33 +85,32 @@ public class ExportDataset {
                 }
             }
         }
-        
+
     }
-    
+
     private static class DocumentExporter implements MyIterable<ir.ac.ut.iis.retrieval_tools.papers.BasePaper> {
-        
+
         private int count = 0;
         private final Writer writer;
-        protected static final org.apache.lucene.analysis.Analyzer analyzer = new DatasetMain.MyAnalyzer();
-        
+
         private DocumentExporter(Writer writer) {
             this.writer = writer;
         }
-        
+
         @Override
         public boolean doAction(ir.ac.ut.iis.retrieval_tools.papers.BasePaper p) {
             if (count % 10_000 == 0) {
                 System.out.println(count + " " + new Date());
             }
-            
+
             String text = p.getTitle() + " " + p.getAbs();
-            
+
             List<String> tokenizeString = PapersRetriever.tokenizeString(text);
             StringBuilder sb = new StringBuilder();
             for (String s : tokenizeString) {
                 sb.append(s).append(" ");
             }
-            
+
             try {
                 writer.write(String.valueOf(p.getId()));
                 writer.write(" 0 ");
@@ -121,10 +119,10 @@ public class ExportDataset {
             } catch (IOException ex) {
                 Logger.getLogger(ExportDataset.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             count++;
             return true;
         }
-        
+
     }
 }

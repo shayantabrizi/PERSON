@@ -107,7 +107,7 @@ public class TopicsReader {
             }
             total += readModel.numTypes * readModel.beta;
 
-            for (Iterator it = alphabet.iterator(); it.hasNext();) {
+            for (Iterator<?> it = alphabet.iterator(); it.hasNext();) {
                 final BytesRef bytesRef = new BytesRef((CharSequence) it.next());
                 float[] get1 = tt.get(bytesRef);
                 if (get1 == null) {
@@ -149,6 +149,10 @@ public class TopicsReader {
 
     public static class DocTopics implements Serializable {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = -5663152865595278533L;
 //        public short docLength;
 //        public short[] topicCounts;
         public float[] topics;

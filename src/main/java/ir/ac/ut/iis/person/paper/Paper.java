@@ -18,7 +18,11 @@ import java.util.Map;
  */
 public class Paper extends Document {
 
-    private final String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 657890078640254881L;
+	private final String name;
     private final String paperAbstract;
     private final String title;
     private final Integer year;

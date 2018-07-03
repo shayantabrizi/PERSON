@@ -134,10 +134,10 @@ public class RandomNeighborSearcher extends Searcher {
 //                    }
                 }
 
-                Map<Integer, Integer> friends = myValueSource.getFriends(q.getSearcher(), 2);
+                Map<Integer, Double> friends = myValueSource.getFriends(q.getSearcher(), 2);
                 Set<Integer> friends1 = new HashSet<>();
                 Set<Integer> friends2 = new HashSet<>();
-                for (Map.Entry<Integer, Integer> e : friends.entrySet()) {
+                for (Map.Entry<Integer, Double> e : friends.entrySet()) {
                     if (e.getValue().equals(1)) {
                         friends1.add(e.getKey());
                     } else {

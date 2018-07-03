@@ -10,7 +10,12 @@ package ir.ac.ut.iis.person.base;
  */
 public class IgnoreQueryEx extends RuntimeException{
 
-    public IgnoreQueryEx() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4954112613700014553L;
+
+	public IgnoreQueryEx() {
     }
 
     public IgnoreQueryEx(String message) {

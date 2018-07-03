@@ -38,7 +38,7 @@ public abstract class MyValueSource extends ValueSource {
     public Map<String, Double> getFeatures() {
         return Collections.unmodifiableMap(features);
     }
-
+    
     @Override
     public boolean equals(Object o) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -53,5 +53,7 @@ public abstract class MyValueSource extends ValueSource {
     public String description() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    public abstract String getName();
 
 }

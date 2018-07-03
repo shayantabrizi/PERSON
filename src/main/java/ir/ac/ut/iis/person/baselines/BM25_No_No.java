@@ -17,13 +17,11 @@ public class BM25_No_No extends ClassicSimilarity {
     private final float avgdl;
     private final float k1;
     private final float b;
-    private final NumericDocValues norms;
 
-    public BM25_No_No(float avgdl, float k1, float b, NumericDocValues norms) {
+    public BM25_No_No(float avgdl, float k1, float b) {
         this.avgdl = avgdl;
         this.k1 = k1;
         this.b = b;
-        this.norms = norms;
     }
 
     @Override

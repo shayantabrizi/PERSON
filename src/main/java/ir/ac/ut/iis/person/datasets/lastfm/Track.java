@@ -18,7 +18,11 @@ import java.util.TreeMap;
  */
 public class Track extends Document {
 
-    private final List<String> tags = new LinkedList<>();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6862566567886649752L;
+	private final List<String> tags = new LinkedList<>();
     private final Map<LastFMUser, Integer> userWeights = new TreeMap<>();
 
     public Track(int id) {

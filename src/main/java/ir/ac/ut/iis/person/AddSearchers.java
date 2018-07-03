@@ -38,7 +38,6 @@ import ir.ac.ut.iis.person.query.NormalizedQueryExpander;
 import ir.ac.ut.iis.person.query.QueryConverter;
 import ir.ac.ut.iis.person.query.QueryExpander;
 import ir.ac.ut.iis.person.topics.InstanceClassifier;
-import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 

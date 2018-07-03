@@ -23,7 +23,6 @@ public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, User>
     private final Object2ObjectOpenHashMap<MeasureCalculator, float[]> measure = new Object2ObjectOpenHashMap<>(1, .75f);
     private float[][] degree;
     private final HierarchyNode hierarchyNode;
-//    private Object processingDummy;
 
     public GraphNode(User id, HierarchyNode hierarchyNode) {
         super(id);

@@ -88,7 +88,7 @@ public class PapersRetriever extends Retriever {
 
     public void createQueries(String queryFile, String topic) {
         int c1 = 0, c2 = 0, c3 = 0, c4 = 0, c5 = 0, c6 = 0;
-        Set<String> authorsSet = new TreeSet();
+        Set<String> authorsSet = new TreeSet<>();
         try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(Configs.datasetRoot + "multidisciplinary-authors-web-not-web.txt"))).useDelimiter("\n")) {
             while (sc.hasNextLine()) {
                 authorsSet.add(sc.nextLine().split(" ")[0]);

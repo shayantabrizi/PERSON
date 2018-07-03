@@ -6,7 +6,6 @@
 package ir.ac.ut.iis.person.base;
 
 import ir.ac.ut.iis.person.Configs;
-import ir.ac.ut.iis.person.DatasetMain;
 import ir.ac.ut.iis.person.Main;
 import ir.ac.ut.iis.person.algorithms.aggregate.MyCustomScoreProvider;
 import ir.ac.ut.iis.person.evaluation.Evaluator;

@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
  *
  * @author shayan
  */
-public class CiteseerxParser implements Parser {
+public class CiteseerxParser implements Parser<PreprocessedPaper> {
 
     private final Digester digester;
 
