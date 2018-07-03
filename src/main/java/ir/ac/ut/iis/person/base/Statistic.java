@@ -33,17 +33,17 @@ public class Statistic implements IStatistic {
 
     @Override
     public void add(double n) {
-        sum += n;
-        sum_all += n;
-        sum2 += n * n;
-        sum2_all += n * n;
-        cnt++;
-        cnt_all++;
-        min = Math.min(min, n);
-        max = Math.max(max, n);
-        min_all = Math.min(min_all, n);
-        max_all = Math.max(max_all, n);
-    }
+            sum += n;
+            sum_all += n;
+            sum2 += n * n;
+            sum2_all += n * n;
+            cnt++;
+            cnt_all++;
+            min = Math.min(min, n);
+            max = Math.max(max, n);
+            min_all = Math.min(min_all, n);
+            max_all = Math.max(max_all, n);
+        }
 
     @Override
     public long getCnt() {
