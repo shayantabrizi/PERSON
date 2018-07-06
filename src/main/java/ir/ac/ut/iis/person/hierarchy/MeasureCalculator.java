@@ -11,14 +11,14 @@ package ir.ac.ut.iis.person.hierarchy;
  */
 public interface MeasureCalculator {
     @Override
-    public abstract String toString();
+     String toString();
 
     @Override
-    public abstract int hashCode();
+     int hashCode();
 
     @Override
-    public abstract boolean equals(Object obj);
+     boolean equals(Object obj);
 
-    public float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level);
+    float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level);
     
 }

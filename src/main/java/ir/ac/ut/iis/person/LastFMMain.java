@@ -28,8 +28,8 @@ public class LastFMMain extends DatasetMain {
     }
 
     @Override
-    protected Hierarchy loadHierarchy() {
-        Hierarchy hier;
+    protected Hierarchy<?> loadHierarchy() {
+        Hierarchy<?> hier;
         try {
             hier = new Hierarchy<>("general");
             hier.load(false, "../datasets/lastfm/lastfm-index", "../datasets/lastfm/lastfm-index/general-only", "/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/hier_friends_clean.tree", false, false);
@@ -46,7 +46,7 @@ public class LastFMMain extends DatasetMain {
 
         String name = Configs.queryField + "," + Configs.baseSimilarityName + ",NOR=" + Configs.numOfResults + ",MB=" + Configs.mapBias + ",DUMPAQ=" + Configs.dontUseMergedPapersAsQuery + ",IQH=" + Configs.InappropriateQueriesHeuristic + ",ISC=" + Configs.ignoreSelfCitations + ",YF=" + Configs.yearFiltering + ",OQWAHMTTP=" + Configs.onlyQueriesWhoseAuthorHasMoreThan_THIS_Papers + ",OQWAHLTTP=" + Configs.onlyQueriesWhoseAuthorHasLessThan_THIS_Papers;
 
-        Hierarchy hier = loadHierarchy();
+        Hierarchy<?> hier = loadHierarchy();
         lastFMExtractor.loadTracks(hier, "/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/users_track.csv", "/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/track_tag.csv");
         Main.retriever = new LastFMRetriever(openSearcher(), name, null, "/home/shayan/Desktop/Taval/thesis/citedata/crowled/queriesFinal.csv", hier.getUserNodeMapping(), lastFMExtractor.getTrackMap());
         Main.outputPath = "../datasets/lastfm/results/" + name;
@@ -178,7 +178,7 @@ public class LastFMMain extends DatasetMain {
 //        }
 //    }
     @Override
-    public Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) {
+    public Hierarchy<?> loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

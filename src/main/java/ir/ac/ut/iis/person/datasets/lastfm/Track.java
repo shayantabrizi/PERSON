@@ -21,7 +21,7 @@ public class Track extends Document {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6862566567886649752L;
+	private static final long serialVersionUID = 6_862_566_567_886_649_752L;
 	private final List<String> tags = new LinkedList<>();
     private final Map<LastFMUser, Integer> userWeights = new TreeMap<>();
 

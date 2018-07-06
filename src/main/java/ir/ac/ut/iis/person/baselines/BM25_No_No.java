@@ -5,7 +5,6 @@
  */
 package ir.ac.ut.iis.person.baselines;
 
-import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 
 /**

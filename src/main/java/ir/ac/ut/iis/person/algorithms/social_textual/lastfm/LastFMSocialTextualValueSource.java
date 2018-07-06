@@ -39,8 +39,8 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
         Iterator<Map.Entry<Integer, Integer>> i = set.iterator();
         while (i.hasNext()) {
             Map.Entry<Integer, Integer> me = i.next();
-            int friendId = ((Number) me.getKey()).intValue();
-            double friendWeight = 1.0 / ((Number) me.getValue()).intValue();
+            int friendId = me.getKey();
+            double friendWeight = 1.0 / me.getValue();
             HashMap<Integer, Double> utMap; //tracks for this friend
             utMap = userTrackWeightSimple(friendId);
             //iterate through tracks (docs) for this friend
@@ -48,7 +48,7 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
             Iterator<Map.Entry<Integer, Double>> j = tracksSet.iterator();
             while (j.hasNext()) {
                 Map.Entry<Integer, Double> me2 = j.next();
-                double trackWeight = ((Number) me2.getValue()).doubleValue(); //normalize?
+                double trackWeight = me2.getValue(); //normalize?
 
                 Double tt = userWeights.get(friendId);
                 if (tt == null) {
@@ -58,7 +58,7 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
                 double weight = trackWeight * friendWeight * tt; //check!
                 double newWeight;
                 if (utSNMap.containsKey(me2.getKey())) { //already in SN hashMap
-                    double oldWeight = ((Number) utSNMap.get(me2.getKey())).doubleValue();
+                    double oldWeight = utSNMap.get(me2.getKey());
                     newWeight = oldWeight + weight;
                 } else {  //first time we see this track
                     newWeight = weight;
@@ -146,7 +146,7 @@ public class LastFMSocialTextualValueSource extends UserBasedValueSource {
 
                     value = rs.getInt(2);
                     //                System.out.println(value + ",2");
-                    if (!uuMap.containsKey(value) || ((Number) uuMap.get(value)).intValue() == 3) {
+                    if (!uuMap.containsKey(value) || uuMap.get(value) == 3) {
                         uuMap.put(value, 2);
                     }
 

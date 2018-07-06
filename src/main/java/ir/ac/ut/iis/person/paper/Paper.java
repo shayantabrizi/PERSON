@@ -21,7 +21,7 @@ public class Paper extends Document {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 657890078640254881L;
+	private static final long serialVersionUID = 657_890_078_640_254_881L;
 	private final String name;
     private final String paperAbstract;
     private final String title;

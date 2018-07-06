@@ -60,7 +60,7 @@ public class PapersExtractor {
         return connection;
     }
 
-    public void doParseAndIndex(Hierarchy root, String topic, boolean makeRootIndex, Map<String, float[]> topics, Map<String, TopicsReader.DocTopics> topicAssignments) {
+    public void doParseAndIndex(Hierarchy<?> root, String topic, boolean makeRootIndex, Map<String, float[]> topics, Map<String, TopicsReader.DocTopics> topicAssignments) {
         PapersReader papersReader = new PapersReader(new Indexer(root, topic, makeRootIndex, topics, topicAssignments));
         papersReader.run(Configs.datasetRoot + "papers_giant.txt");
 
@@ -158,7 +158,7 @@ public class PapersExtractor {
 
     private class Indexer implements ir.ac.ut.iis.retrieval_tools.domain.MyIterable<ir.ac.ut.iis.retrieval_tools.papers.BasePaper> {
 
-        private final Hierarchy root;
+        private final Hierarchy<?> root;
         private int count = 0;
         private final String topic;
         private Map<Integer, List<String>> readWeights;
@@ -166,7 +166,7 @@ public class PapersExtractor {
         private final Map<String, float[]> topics;
         private final Map<String, TopicsReader.DocTopics> docTopics;
 
-        private Indexer(Hierarchy root, String topic, boolean makeRootIndex, Map<String, float[]> topics, Map<String, TopicsReader.DocTopics> docTopics) {
+        private Indexer(Hierarchy<?> root, String topic, boolean makeRootIndex, Map<String, float[]> topics, Map<String, TopicsReader.DocTopics> docTopics) {
             this.root = root;
             this.topic = topic;
             if (topic != null) {
@@ -221,7 +221,7 @@ public class PapersExtractor {
             return true;
         }
 
-        protected void doIndex(Paper node, Hierarchy hier) throws IOException {
+        protected void doIndex(Paper node, Hierarchy<?> hier) throws IOException {
             Document doc;
             if (makeRootIndex) {
                 doc = makeCompleteDocument(node);

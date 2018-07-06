@@ -13,7 +13,7 @@ public class IgnoreQueryEx extends RuntimeException{
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4954112613700014553L;
+	private static final long serialVersionUID = -4_954_112_613_700_014_553L;
 
 	public IgnoreQueryEx() {
     }

@@ -56,7 +56,7 @@ public class PapersMain extends DatasetMain {
     }
 
     @Override
-    protected Hierarchy loadHierarchy() {
+    protected Hierarchy<?> loadHierarchy() {
         return loadHierarchy(Configs.datasetRoot + Configs.graphFile, Configs.clustersFileName == null ? null : Configs.datasetRoot + "clusters/" + Configs.clustersFileName + ".tree", Configs.clustersFileName, false, false, false);
     }
 

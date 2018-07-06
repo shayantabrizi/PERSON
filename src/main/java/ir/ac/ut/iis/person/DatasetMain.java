@@ -83,9 +83,9 @@ public abstract class DatasetMain implements Closeable {
         return get;
     }
 
-    protected abstract Hierarchy loadHierarchy();
+    protected abstract Hierarchy<?> loadHierarchy();
 
-    public abstract Hierarchy loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters, boolean loadAsFlatHierarchy);
+    public abstract Hierarchy<?> loadHierarchy(String graphFile, String clustersFile, String name, boolean ignoreLastWeight, boolean addNodesAsClusters, boolean loadAsFlatHierarchy);
 
     public IndexSearcher getIndexSearcher() {
         return indexSearcher;

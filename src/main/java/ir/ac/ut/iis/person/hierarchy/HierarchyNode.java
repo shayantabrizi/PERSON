@@ -50,7 +50,7 @@ public class HierarchyNode {
     private Term cache = null;
     private long valueCache = 0;
     private double totalFreq = -1d;
-    private Map<PPRCalculator, float[]> selfPPR = new HashMap<>();
+    private final Map<PPRCalculator, float[]> selfPPR = new HashMap<>();
     private int usersNum = 0;
     private static PreparedStatement selectSelfStatement = null;
     private static final Map<Integer, PreparedStatement> selectUserStatements = new HashMap<>();

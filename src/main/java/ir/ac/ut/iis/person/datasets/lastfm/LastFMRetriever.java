@@ -8,6 +8,7 @@ package ir.ac.ut.iis.person.datasets.lastfm;
 import ir.ac.ut.iis.person.Main;
 import ir.ac.ut.iis.person.base.Retriever;
 import ir.ac.ut.iis.person.evaluation.Evaluator;
+import ir.ac.ut.iis.person.hierarchy.GraphNode;
 import ir.ac.ut.iis.person.hierarchy.User;
 import ir.ac.ut.iis.person.paper.PapersRetriever;
 import ir.ac.ut.iis.person.query.Query;
@@ -37,12 +38,12 @@ import org.apache.lucene.search.similarities.ClassicSimilarity;
  */
 public class LastFMRetriever extends Retriever {
 
-    private final Int2ObjectOpenHashMap<LastFMUser> usersMap;
+    private final Int2ObjectOpenHashMap<GraphNode> usersMap;
     private final Map<String, Track> tracksMap;
     private final IndexSearcher rootSearcher;
     private final Scanner scanner;
 
-    public LastFMRetriever(IndexSearcher rootSearcher, String name, Evaluator evaluator, String queryFile, Int2ObjectOpenHashMap<LastFMUser> usersMap, Map<String, Track> tracksMap) {
+    public LastFMRetriever(IndexSearcher rootSearcher, String name, Evaluator evaluator, String queryFile, Int2ObjectOpenHashMap<GraphNode> usersMap, Map<String, Track> tracksMap) {
         super(name, evaluator);
         this.rootSearcher = rootSearcher;
         try {
@@ -87,7 +88,7 @@ public class LastFMRetriever extends Retriever {
     }
 
     protected Map<String, Double> findRelevants(String user) {
-        final LastFMUser u = usersMap.get(Integer.parseInt(user));
+        final LastFMUser u = (LastFMUser) usersMap.get(Integer.parseInt(user)).getId();
         final Map<String, Double> map = new TreeMap<>();
         rootSearcher.setSimilarity(new ClassicSimilarity());
         for (Map.Entry<Track, Integer> e : u.getDocWeights().entrySet()) {

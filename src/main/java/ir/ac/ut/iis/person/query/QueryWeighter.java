@@ -22,10 +22,10 @@ import org.apache.lucene.index.Term;
  */
 public class QueryWeighter extends QueryConverter {
 
-    protected Hierarchy hier;
+    protected Hierarchy<?> hier;
     private final double lambda;
 
-    public QueryWeighter(Hierarchy hier, double lambda) {
+    public QueryWeighter(Hierarchy<?> hier, double lambda) {
         super();
         this.hier = hier;
         this.lambda = lambda;

@@ -114,7 +114,7 @@ public class HEPExtractor {
             return true;
         }
 
-        protected void doIndex(Paper node, Hierarchy hier) throws IOException {
+        protected void doIndex(Paper node, Hierarchy<?> hier) throws IOException {
             Document doc;
             if (makeRootIndex) {
                 doc = makeCompleteDocument(node);

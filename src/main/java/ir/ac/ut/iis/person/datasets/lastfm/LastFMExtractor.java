@@ -118,7 +118,7 @@ public class LastFMExtractor {
 
     private class Indexer implements MyIterable<Track> {
 
-        private final Hierarchy root;
+        private final Hierarchy<?> root;
         private int count = 0;
         private final boolean makeRootIndex;
 
@@ -152,7 +152,7 @@ public class LastFMExtractor {
             return true;
         }
 
-        protected void doIndex(Track node, Hierarchy hier) throws IOException {
+        protected void doIndex(Track node, Hierarchy<?> hier) throws IOException {
             Document doc;
             if (makeRootIndex) {
                 doc = makeCompleteDocument(node);

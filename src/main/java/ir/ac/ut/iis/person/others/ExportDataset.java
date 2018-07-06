@@ -6,7 +6,6 @@
 package ir.ac.ut.iis.person.others;
 
 import ir.ac.ut.iis.person.Configs;
-import ir.ac.ut.iis.person.DatasetMain;
 import ir.ac.ut.iis.person.paper.PapersRetriever;
 import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
 import ir.ac.ut.iis.retrieval_tools.domain.MyIterable;

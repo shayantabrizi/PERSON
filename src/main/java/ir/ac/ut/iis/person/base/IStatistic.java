@@ -21,7 +21,7 @@ public interface IStatistic {
      boolean equals(Object obj);
 
     @Override
-    public String toString();
+     String toString();
 
      String toString(boolean verbose);
 }

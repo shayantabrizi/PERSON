@@ -152,7 +152,7 @@ public class TopicsReader {
         /**
          *
          */
-        private static final long serialVersionUID = -5663152865595278533L;
+        private static final long serialVersionUID = -5_663_152_865_595_278_533L;
 //        public short docLength;
 //        public short[] topicCounts;
         public float[] topics;

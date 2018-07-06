@@ -79,7 +79,7 @@ public class AMinerPreprocessor {
                         pp.addCreator(a);
                     }
                 } else if (nextLine.startsWith("#t")) {
-                    if (Integer.parseInt(nextLine.substring(2)) <= 2002) {
+                    if (Integer.parseInt(nextLine.substring(2)) <= 2_002) {
                         ppCheck = false;
                         continue;
                     }

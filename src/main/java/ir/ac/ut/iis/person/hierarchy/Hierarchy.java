@@ -62,7 +62,7 @@ public class Hierarchy<U extends User> {
         rootNode.setValues(hier.rootNode);
     }
 
-    public void loadSingleClusterHierarchy(Hierarchy hier, String graphFile) {
+    public void loadSingleClusterHierarchy(Hierarchy<?> hier, String graphFile) {
         rootNode.setValues(hier.rootNode);
         hier.getUserNodeMapping().forEach(new BiConsumer<Integer, GraphNode>() {
             @Override
