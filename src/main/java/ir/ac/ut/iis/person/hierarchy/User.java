@@ -11,7 +11,7 @@ import java.util.Objects;
  *
  * @author shayan
  */
-public class User implements Comparable<User> {
+public class User implements Comparable<IUser>, IUser {
 
     int id;
     private float[] topics;
@@ -21,14 +21,17 @@ public class User implements Comparable<User> {
         this.id = id;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public void setTmpArray(float[] tmpArray) {
         this.tmpArray = tmpArray;
     }
 
+    @Override
     public float[] getTmpArray() {
         return tmpArray;
     }
@@ -42,8 +45,8 @@ public class User implements Comparable<User> {
     }
 
     @Override
-    public int compareTo(User o) {
-        return Integer.compare(id, o.id);
+    public int compareTo(IUser o) {
+        return Integer.compare(id, o.getId());
     }
 
     @Override
@@ -65,10 +68,7 @@ public class User implements Comparable<User> {
             return false;
         }
         final User other = (User) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
 }

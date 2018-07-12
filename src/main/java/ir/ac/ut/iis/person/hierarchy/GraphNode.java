@@ -17,14 +17,14 @@ import java.util.List;
  *
  * @author shayan
  */
-public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, User> {
+public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, IUser> {
 
     private final ObjectArrayList<HierarchicalEdge> edges = new ObjectArrayList<>();
     private final Object2ObjectOpenHashMap<MeasureCalculator, float[]> measure = new Object2ObjectOpenHashMap<>(1, .75f);
     private float[][] degree;
     private final HierarchyNode hierarchyNode;
 
-    public GraphNode(User id, HierarchyNode hierarchyNode) {
+    public GraphNode(IUser id, HierarchyNode hierarchyNode) {
         super(id);
         this.hierarchyNode = hierarchyNode;
     }
@@ -68,12 +68,12 @@ public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, User>
         }
     }
 
-    public float[] getTmpPPR() {
+    public float[] getTmpArray() {
         return getId().getTmpArray();
     }
 
-    public void setTmpPPR(float[] tmpPPR) {
-        getId().setTmpArray(tmpPPR);
+    public void setTmpArray(float[] tmpArray) {
+        getId().setTmpArray(tmpArray);
     }
 
     public float[] getDegree(short level) {
@@ -99,10 +99,10 @@ public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, User>
     public void addMeasure(MeasureCalculator clusterId, float[] measure) {
         this.measure.put(clusterId, measure);
     }
-    
+
     public void resetMeasure() {
         this.measure.clear();
-    }    
+    }
 
 //    public Object getProcessingDummy() {
 //        return processingDummy;

@@ -33,8 +33,8 @@ public class CiteseerxPreprocessor implements IterableToFiles<List<?>> {
         IterateOnFiles iof = new IterateOnFiles(citeseerxPreprocessor, new CiteseerxParser());
         iof.iterate(new File("/home/shayan/Desktop/Taval/citeseerx-oai"));
         citeseerxPreprocessor.pp.postProcess();
-        PapersPreprocessor.convertAuthorsFileToGraphs("authors_giant.txt", "authors_graph_giant.csv");
-        PapersPreprocessor.convertPapersFileToGraph("papers_giant.txt", "papers_graph_giant.csv");
+        PapersPreprocessor.convertAuthorsFileToGraphs("authors_giant.txt", "authors_giant_graph.csv");
+        PapersPreprocessor.convertPapersFileToGraph("papers_giant.txt", "papers_giant_graph.csv");
     }
 
 }

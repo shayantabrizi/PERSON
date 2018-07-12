@@ -147,6 +147,7 @@ public class HierarchyNode {
     public HierarchyNode getChild(GraphNode user) {
         HierarchyNode lastNode = null;
         HierarchyNode currentNode = user.getHierarchyNode();
+
         while (!currentNode.equals(this)) {
             lastNode = currentNode;
             currentNode = currentNode.getParent();

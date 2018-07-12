@@ -21,10 +21,8 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 
 /**
@@ -58,7 +56,7 @@ public class Hierarchy<U extends User> {
 
     public void load(String clustersFile, boolean create, String indexersRoot, Hierarchy hier, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) throws IOException {
         rootNode.setPath(indexersRoot);
-        this.loadHierarchy(create, clustersFile, addNodesAsClusters, loadAsFlatHierarchy);
+        this.loadHierarchy(create, clustersFile, addNodesAsClusters, loadAsFlatHierarchy, false);
         rootNode.setValues(hier.rootNode);
     }
 
@@ -71,16 +69,16 @@ public class Hierarchy<U extends User> {
             }
         });
         if (Configs.loadGraph) {
-            this.readGraph(graphFile, false);
+            this.readGraph(graphFile, false, null);
         }
     }
 
-    public void load(boolean create, String rootIndexer, String indexersRoot, String clustersFile, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) throws IOException {
+    public void load(boolean create, String rootIndexer, String indexersRoot, String clustersFile, boolean addNodesAsClusters, boolean loadAsFlatHierarchy, boolean isMultiLayer) throws IOException {
         rootNode.setPath(indexersRoot);
         rootNode.setLevel((short) 0);
 
         if (clustersFile != null) {
-            this.loadHierarchy(create, clustersFile, addNodesAsClusters, loadAsFlatHierarchy);
+            this.loadHierarchy(create, clustersFile, addNodesAsClusters, loadAsFlatHierarchy, isMultiLayer);
         }
 
         rootNode.setPath(rootIndexer);
@@ -103,7 +101,7 @@ public class Hierarchy<U extends User> {
                 new File(relativePath).toPath()), new IndexWriterConfig(new DatasetMain.MyAnalyzer()));
     }
 
-    public void loadHierarchy(boolean create, String clustersFile, boolean addNodesAsClusters, boolean loadAsFlatHierarchy) throws FileNotFoundException, CorruptIndexException, CorruptIndexException, LockObtainFailedException, IOException {
+    public void loadHierarchy(boolean create, String clustersFile, boolean addNodesAsClusters, boolean loadAsFlatHierarchy, boolean isMultiLayer) {
         Logger.getLogger(Hierarchy.class.getName()).log(Level.INFO, "Loading hierarchy started.");
         try (Scanner scanner = new Scanner(new File(clustersFile))) {
             String topLevelCluster = null;
@@ -144,10 +142,24 @@ public class Hierarchy<U extends User> {
                 if (addNodesAsClusters || currentNode == rootNode) {
                     currentNode = createHierarchyNode(currentNode, -(code + 1), create);
                 }
-                GraphNode user = new GraphNode(DatasetMain.getInstance().getUser(code), currentNode);
+                IUser u;
+                if (isMultiLayer) {
+                    if (code < 100_000_000) {
+                        u = DatasetMain.getInstance().getUser(code);
+                        u = new UserWithIdentities(u);
+                    } else {
+                        u = new Identity(code);
+                    }
+                } else {
+                    u = DatasetMain.getInstance().getUser(code);
+                }
+                GraphNode user = new GraphNode(u, currentNode);
                 currentNode.addUser(user);
                 userNodeMapping.put(code, user);
             }
+        } catch (IOException | NumberFormatException ex) {
+            Logger.getLogger(Hierarchy.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
         }
         userNodeMapping.trim();
         rootNode.optimize();
@@ -204,8 +216,32 @@ public class Hierarchy<U extends User> {
         return hierarchyNodesChildFirst;
     }
 
-    public void readGraph(String graphFileName, boolean ignoreLastWeight) {
+    public void readGraph(String graphFileName, boolean ignoreLastWeight, String multiLayerMappingFile) {
         Logger.getLogger(Hierarchy.class.getName()).log(Level.INFO, "Reading graph started.");
+        if (multiLayerMappingFile != null) {
+            try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(multiLayerMappingFile)))) {
+                UserWithIdentities user;
+                while (sc.hasNextLine()) {
+                    String[] nextLine = sc.nextLine().split(",");
+                    int uid = Integer.parseInt(nextLine[0]);
+                    GraphNode u = userNodeMapping.get(uid);
+                    for (int i = 1; i < nextLine.length; i += 3) {
+                        int topic = Integer.parseInt(nextLine[i]);
+                        int id = Integer.parseInt(nextLine[i + 1]);
+                        float weight = Float.parseFloat(nextLine[i + 2]);
+                        GraphNode identity = userNodeMapping.get(id);
+                        Identity iden = (Identity) identity.getId();
+                        iden.setTopic(topic);
+                        iden.setUser(u.getId());
+                        iden.setWeight(weight);
+                        ((UserWithIdentities) u.getId()).addIdentity(topic, iden);
+                    }
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Hierarchy.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RuntimeException();
+            }
+        }
         boolean isChanged = false;
         try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(graphFileName)))) {
             while (sc.hasNextLine()) {
@@ -276,10 +312,10 @@ public class Hierarchy<U extends User> {
         Logger.getLogger(Hierarchy.class.getName()).log(Level.INFO, "Reading graph finished.");
     }
 
-    public GraphNode addNode(final int parseInt1) {
-        GraphNode user = new GraphNode(DatasetMain.getInstance().getUser(parseInt1), rootNode);
+    public GraphNode addNode(final int id) {
+        GraphNode user = new GraphNode(DatasetMain.getInstance().getUser(id), rootNode);
         rootNode.addUser(user);
-        userNodeMapping.put(parseInt1, user);
+        userNodeMapping.put(id, user);
         return user;
     }
 

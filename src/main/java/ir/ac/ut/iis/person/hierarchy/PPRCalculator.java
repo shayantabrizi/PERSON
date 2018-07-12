@@ -66,7 +66,7 @@ public abstract class PPRCalculator implements MeasureCalculator {
                 tmp[i] = 0;
             }
             u.addMeasure(this, arr);
-            u.setTmpPPR(tmp);
+            u.setTmpArray(tmp);
         }
         //        for (User u : topic) {
         //            u.addPPR(id, .99 / size);
@@ -109,7 +109,7 @@ public abstract class PPRCalculator implements MeasureCalculator {
                     //                        System.out.println("");
                     //                    }
                     for (int i = 0; i < numOfWeights; i++) {
-                        otherSide.getTmpPPR()[i] = (float) (otherSide.getTmpPPR()[i] + e.getWeight()[i] / degree[i] * ppr[i] * (1 - alpha));
+                        otherSide.getTmpArray()[i] = (float) (otherSide.getTmpArray()[i] + e.getWeight()[i] / degree[i] * ppr[i] * (1 - alpha));
                     }
                 }
             }
@@ -121,11 +121,11 @@ public abstract class PPRCalculator implements MeasureCalculator {
             for (GraphNode u : parent) {
                 final float[] ppr = u.getMeasure(this);
                 for (int i = 0; i < numOfWeights; i++) {
-                    float abs = Math.abs(u.getTmpPPR()[i] - ppr[i]);
+                    float abs = Math.abs(u.getTmpArray()[i] - ppr[i]);
                     diff[i] = Math.max(diff[i], abs);
-                    ppr[i] = u.getTmpPPR()[i];
+                    ppr[i] = u.getTmpArray()[i];
                     //                    sum += u.getTmpPPR()[i];
-                    u.getTmpPPR()[i] = 0.f;
+                    u.getTmpArray()[i] = 0.f;
                 }
             }
             //            System.out.println(sum);

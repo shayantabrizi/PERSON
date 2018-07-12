@@ -9,7 +9,7 @@ import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.algorithms.social_textual.MySQLConnector;
 import ir.ac.ut.iis.person.datasets.citeseerx.PapersExtractor;
 import ir.ac.ut.iis.person.hierarchy.GraphNode;
-import ir.ac.ut.iis.person.hierarchy.User;
+import ir.ac.ut.iis.person.hierarchy.IUser;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -142,10 +142,10 @@ public class TopicsProfileGenerator implements Closeable {
 
     private static class UserData {
 
-        User u;
+        IUser u;
         int docCount = 0;
 
-        private UserData(User u) {
+        private UserData(IUser u) {
             this.u = u;
         }
     }
