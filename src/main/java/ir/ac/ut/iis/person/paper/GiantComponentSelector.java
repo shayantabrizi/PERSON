@@ -198,7 +198,7 @@ public class GiantComponentSelector {
     }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        new GiantComponentSelector().extractGiantCompnent();
+        new GiantComponentSelector().extractGiantCompnent(true); // false may cause edges corresponding to removed documents whose authors are in the giant component to remain
 //        pruneAuthorsGiant("papers_giant.txt", "authors_giant.txt");
     }
 
@@ -254,12 +254,33 @@ public class GiantComponentSelector {
         return currentTemp;
     }
 
-    private void extractGiantCompnent() throws NumberFormatException {
+    private void extractGiantCompnent(boolean isPaperBasedAuthors) throws NumberFormatException {
         String authorsFileName = "authors.txt";
         String papersFileName = "papers.txt";
         int i = 0;
         while (true) {
-            final Map<Long, Set<Long>> readGraphFile = readGraphFile(authorsFileName);
+            final Map<Long, Set<Long>> readGraphFile;
+            if (isPaperBasedAuthors) {
+                readGraphFile = new HashMap<>();
+                try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(papersFileName)))) {
+                    sc.useDelimiter("\n");
+                    while (sc.hasNext()) {
+                        Paper readPaper = readPaper(sc);
+                        for (Long author : readPaper.authors) {
+                            for (Long author2 : readPaper.authors) {
+                                if (!author.equals(author2)) {
+                                    addToMap(readGraphFile, author, author2);
+                                }
+                            }
+                        }
+                    }
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new RuntimeException();
+                }
+            } else {
+                readGraphFile = readGraphFile(authorsFileName);
+            }
             giant = getGiantComponent(readGraphFile);
             if (giant.size() == readGraphFile.size()) {
                 break;
@@ -408,18 +429,8 @@ public class GiantComponentSelector {
                 if (!rels.isEmpty()) {
                     for (String ref : rels.split(",")) {
                         Long l = Long.parseLong(ref.split(" ")[0]);
-                        Set<Long> get = graph.get(l);
-                        if (get == null) {
-                            get = new HashSet<>();
-                            graph.put(l, get);
-                        }
-                        get.add(id);
-                        get = graph.get(id);
-                        if (get == null) {
-                            get = new HashSet<>();
-                            graph.put(id, get);
-                        }
-                        get.add(l);
+                        addToMap(graph, l, id);
+                        addToMap(graph, id, l);
                     }
                 }
             }
@@ -427,6 +438,15 @@ public class GiantComponentSelector {
             Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return graph;
+    }
+
+    private void addToMap(Map<Long, Set<Long>> graph, Long l, Long id) {
+        Set<Long> get = graph.get(l);
+        if (get == null) {
+            get = new HashSet<>();
+            graph.put(l, get);
+        }
+        get.add(id);
     }
 
     public void bfs(Long src, int compId, Map<Long, Integer> visited, Map<Long, Set<Long>> graph) {
