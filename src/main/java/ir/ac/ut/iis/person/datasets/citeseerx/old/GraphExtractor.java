@@ -6,7 +6,6 @@
 package ir.ac.ut.iis.person.datasets.citeseerx.old;
 
 import ir.ac.ut.iis.person.Configs;
-import ir.ac.ut.iis.person.others.ExtractTopicGraphs.AuthorsPair;
 import ir.ac.ut.iis.retrieval_tools.azimi.TaxonomyHierarchyReader;
 import ir.ac.ut.iis.retrieval_tools.other.StopWordsExtractor.MapUtil;
 import java.io.BufferedInputStream;
@@ -37,7 +36,7 @@ public class GraphExtractor {
 
     public static void main(String[] args) throws FileNotFoundException {
 //        extractWeights(new File(Main.datasetRoot+"topics/topics"));
-        createGraphs(Configs.datasetRoot+"papers_giant.txt", Configs.datasetRoot+"authors_giant.txt", Configs.datasetRoot +"graph-weights.txt", Configs.datasetRoot + "graphs/");
+        createGraphs(Configs.datasetRoot + "papers_giant.txt", Configs.datasetRoot + "authors_giant.txt", Configs.datasetRoot + "graph-weights.txt", Configs.datasetRoot + "graphs/");
 //        calcWeightStats("graph-weights.txt","weights-stats.txt");
 //        convertWeightsToGraph(Main.citeseerxRdatasetRootopics/topics.txt", "topics_graph.txt", "topics_mapping.txt");
 //        findRepresentatives("topics_clusters.txt", "topics_mapping.txt", "topics_graph.txt");
@@ -199,13 +198,13 @@ public class GraphExtractor {
 //                                        get = new TreeMap<>();
 //                                        map.put(authorsPair, get);
 //                                    }
-List<String> l = weights.get(id);
+                                    List<String> l = weights.get(id);
 //                                    if (l == null) {
 //                                        System.out.println(id);
 //                                        ss.add(id);
 //                                        continue;
 //                                    }
-for (String topic : l) {
+                                    for (String topic : l) {
 //                                        Integer count = get.get(topic);
 //                                        if (count == null) {
 //                                            count = 0;
@@ -213,8 +212,8 @@ for (String topic : l) {
 //                                        count++;
 //                                        get.put(topic, count);
 //                                        System.out.println(topic);
-writers.get(topic).write(authorsPair.author1 + " " + authorsPair.author2 + "\n");
-}
+                                        writers.get(topic).write(authorsPair.author1 + " " + authorsPair.author2 + "\n");
+                                    }
                                 }
                             }
                         }
@@ -430,4 +429,29 @@ writers.get(topic).write(authorsPair.author1 + " " + authorsPair.author2 + "\n")
         }
 
     }
+
+    public static class AuthorsPair implements Comparable<AuthorsPair> {
+
+        public Integer author1;
+        public Integer author2;
+
+        public AuthorsPair(Integer author1, Integer author2) {
+            this.author1 = author1;
+            this.author2 = author2;
+        }
+
+        @Override
+        public int compareTo(AuthorsPair o) {
+            int c1 = author1.compareTo(o.author1);
+            if (c1 != 0) {
+                return c1;
+            }
+            int c2 = author2.compareTo(o.author2);
+            if (c2 != 0) {
+                return c2;
+            }
+            return 0;
+        }
+    }
+
 }
