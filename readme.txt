@@ -2,8 +2,10 @@
 
 PERSON: Personalized Information Retrieval Evaluation Based on Citation Networks
 
-Based on the article "PERSON: Personalized Information Retrieval Evaluation Based on Citation Networks"
-Authors: S.A. Tabrizi, A. Shakery, H. Zamani, M.A. Tavallaie
+Based on article [Shayan A. Tabrizi, Azadeh Shakery, Hamed Zamani, and Mohammad Ali Tavallaei, 
+			"PERSON: Personalized Information Retrieval Evaluation Based on Citation Networks," 
+			Information Processing & Management (IP&M), 2018] 
+			(https://www.sciencedirect.com/science/article/abs/pii/S0306457317307811)
 Version: 1.0
 
 -----------------------------------------------------------------------------
