@@ -39,6 +39,7 @@ public class AMinerPreprocessor {
             sc.useDelimiter("\n");
             PreprocessedPaper pp = null;
             boolean ppCheck = true;
+            sc.nextLine();
             while (sc.hasNext()) {
                 String nextLine = sc.next();
                 if (pp == null) {

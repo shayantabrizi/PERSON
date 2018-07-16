@@ -383,10 +383,10 @@ public class GiantComponentSelector {
         return paper;
     }
 
-    public Set<Long> getGiantComponent(Map<Long, Set<Long>> graph) {
-        Map<Long, Integer> visited = new HashMap<>();
+    public static <T extends Number> Set<T> getGiantComponent(Map<T, Set<T>> graph) {
+        Map<T, Integer> visited = new HashMap<>();
         int compId = 0;
-        for (Long id : graph.keySet()) {
+        for (T id : graph.keySet()) {
             if (!visited.containsKey(id)) {
                 bfs(id, compId, visited, graph);
                 compId++;
@@ -395,7 +395,7 @@ public class GiantComponentSelector {
         Map<Integer, Integer> counts = new HashMap<>();
         int max = 0;
         int maxId = 0;
-        for (Map.Entry<Long, Integer> e : visited.entrySet()) {
+        for (Map.Entry<T, Integer> e : visited.entrySet()) {
             Integer get = counts.get(e.getValue());
             if (get == null) {
                 get = 0;
@@ -407,8 +407,8 @@ public class GiantComponentSelector {
             }
             counts.put(e.getValue(), get);
         }
-        Set<Long> giantComponent = new HashSet<>();
-        for (Map.Entry<Long, Integer> e : visited.entrySet()) {
+        Set<T> giantComponent = new HashSet<>();
+        for (Map.Entry<T, Integer> e : visited.entrySet()) {
             if (e.getValue().equals(maxId)) {
                 giantComponent.add(e.getKey());
             }
@@ -449,13 +449,13 @@ public class GiantComponentSelector {
         get.add(id);
     }
 
-    public void bfs(Long src, int compId, Map<Long, Integer> visited, Map<Long, Set<Long>> graph) {
-        LinkedList<Long> list = new LinkedList<>();
+    public static <T extends Number> void bfs(T src, int compId, Map<T, Integer> visited, Map<T, Set<T>> graph) {
+        LinkedList<T> list = new LinkedList<>();
         list.add(src);
         visited.put(src, compId);
         while (!list.isEmpty()) {
-            Long currentnode = list.removeFirst();
-            for (Long n : graph.get(currentnode)) {
+            T currentnode = list.removeFirst();
+            for (T n : graph.get(currentnode)) {
                 if (!visited.containsKey(n)) {
                     visited.put(n, compId);
                     list.add(n);
