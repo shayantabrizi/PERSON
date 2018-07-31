@@ -6,7 +6,7 @@ Based on article [Shayan A. Tabrizi, Azadeh Shakery, Hamed Zamani, and Mohammad 
 			"PERSON: Personalized Information Retrieval Evaluation Based on Citation Networks," 
 			Information Processing & Management (IP&M), 2018] 
 			(https://www.sciencedirect.com/science/article/abs/pii/S0306457317307811)
-Version: 1.0
+Version: 1.1
 
 -----------------------------------------------------------------------------
 
@@ -25,3 +25,8 @@ The codes are dependent on retrieval-tools (https://github.com/shayantabrizi/ret
 
 Usage:
 	See tutorial.pdf for the instructions on how to use the codes.
+
+Change Log:
+Release 1.1:
+	Improvements: The Social-Textual method is now based on a TFIDF-based method (ClassicSimilarity) instead of a language-modeling-based method. The previous implementation was probably inconsistent with the Social-Textual paper.
+Release 1.0

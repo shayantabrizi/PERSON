@@ -258,7 +258,7 @@ public class AddSearchers {
         outputPath += "," + Configs.socialTextualParameters();
 
 //        Map<Integer, Integer> docIdMap = generateDocIdMap(hiers[0].getRootNode().getSearcher().getIndexReader());
-        MyValueSource myValueSource = new CiteseerxSocialTextualValueSource(Configs.database_name, .09);
+        MyValueSource myValueSource = new CiteseerxSocialTextualValueSource(Configs.database_name, Configs.selfConsiderConstant);
 //                MyValueSource myValueSourceNoPenalization = new CiteseerxSocialTextualValueSource(database_name, docIdMap);
 //                ((CiteseerxSocialTextualValueSource) myValueSourceNoPenalization).setPenalizeMultipleAuthors(false);
 //                MyValueSource myValueSourceNoUseUserWeight = new CiteseerxSocialTextualValueSource(database_name, docIdMap);
