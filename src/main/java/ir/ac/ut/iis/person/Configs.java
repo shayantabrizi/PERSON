@@ -21,7 +21,7 @@ public class Configs {
     public static final int numOfResults = 100;     // Number of results retrieved
     public static boolean InappropriateQueriesHeuristic = true;     // Whether to use inappropriate queries heuristic or not
     public static int skipQueries = 13_000;        // Skip this number of queries from the list of queries
-    public static int queryCount = 2000;       // The number of queries to consider
+    public static int queryCount = 2_000;       // The number of queries to consider
     public static int ndcgAt = 100;             // k=ndcgAt for calculating NDCG@k
     public static final boolean useDFCache = true;      // Just keep it unchanged
     public static boolean useSearchCaching = true;   // See the comments for ignoreSelfCitations
@@ -71,6 +71,7 @@ public class Configs {
 
     // SocialTextual parameters
     public static int socialTextualDegree = 2;        // Keep it unchanged. Use friends and friends-of-friends in Social-Textual
+    public static double selfConsiderConstant = .09;   // If 0., do not consider the searcher himself in scoring. Otherwise, consider a User Relatedness (urf) of 1/selfConsiderConstant for the searcher. May be overriden in CiteseerxSocialTextualValueSource constructor.
     public static boolean penalizeMultipleAuthorsInSocialTextual = true;      // Penalize the contribution of an author in a paper when there are more authors
     public static boolean considerFriendsOfFriendsInRandomNeighborFilteringSearcher = false;    // Just ignore it
     public static float ratioOfCandidateToResults = 2.f;        // Just ignore it
@@ -123,7 +124,7 @@ public class Configs {
     }
 
     public static String socialTextualParameters() {
-        return "SocialTextual[KD=" + socialTextualDegree + ",PMAIK=" + penalizeMultipleAuthorsInSocialTextual + ",CFOFIRNFS=" + considerFriendsOfFriendsInRandomNeighborFilteringSearcher + ",ROFTR=" + ratioOfCandidateToResults + "]";
+        return "SocialTextual[KD=" + socialTextualDegree + ",PMAIK=" + penalizeMultipleAuthorsInSocialTextual + ",CFOFIRNFS=" + considerFriendsOfFriendsInRandomNeighborFilteringSearcher + ",ROFTR=" + ratioOfCandidateToResults + ",SCC=" + selfConsiderConstant + "]";
     }
 
     public static String topicParameters() {
