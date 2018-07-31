@@ -63,9 +63,6 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
             if (useFriendWeight) {
                 friendWeight = 1.0 / me.getValue();
             }
-            if (friendWeight > 1.) {
-                System.out.println("");
-            }
             Map<Integer, Double> utMap; //tracks for this friend
             utMap = uMap.map;
             //iterate through tracks (docs) for this friend
@@ -82,7 +79,7 @@ public class CiteseerxSocialTextualValueSource extends UserBasedValueSource {
                 double weight = trackWeight * friendWeight * tt; //check!
                 double newWeight = -1;
                 if (utSNMap.containsKey(me2.getKey())) { //already in SN hashMap
-                    double oldWeight = me2.getKey();
+                    double oldWeight = utSNMap.get(me2.getKey());
                     newWeight = oldWeight + weight;
                 } else {  //first time we see this track
                     newWeight = weight;
