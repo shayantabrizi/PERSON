@@ -76,7 +76,7 @@ public class PapersMain extends DatasetMain {
         }
 
         if (Configs.loadGraph) {
-            hier.readGraph(graphFile, ignoreLastWeight, null);
+            hier.readGraph(graphFile, ignoreLastWeight, isMultiLayer);
         }
         return hier;
     }
@@ -93,6 +93,7 @@ public class PapersMain extends DatasetMain {
 //        ((PapersRetriever) Main.retriever).createSimpleQueries(Configs.datasetRoot + "queries/general-queries.txt");
         if (Configs.runStage.equals(Configs.RunStage.CREATE_QUERIES)) {
             ((PapersRetriever) Main.retriever).createSimpleQueries(Configs.datasetRoot + "queries/general.txt", null);
+//            ((PapersRetriever) Main.retriever).createMultidisciplinaryQueries(Configs.datasetRoot + "queries/multidisciplinary.txt");
         }
 //        ((PapersRetriever) Main.retriever).createMultidisciplinaryQueries(Configs.datasetRoot + "queries/multidisciplinary-queries.txt");
 //        System.exit(0);
@@ -131,7 +132,9 @@ public class PapersMain extends DatasetMain {
             hier.getRootNode().close();
             if (Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES_WITH_TOPICS_STEP1)) {
                 initialize(null, null);
-                new TopicsProfileGenerator(Configs.database_name).generateTopicsProfile(new ObjectOpenHashSet<>(loadHierarchy().getUserNodeMapping().values()), DatasetMain.getInstance().getIndexSearcher(), topics);
+                try (TopicsProfileGenerator tpf = new TopicsProfileGenerator(Configs.database_name, Configs.useDirichletEstimationForAuthorTopics)) {
+                    tpf.generateTopicsProfile(new ObjectOpenHashSet<>(loadHierarchy().getUserNodeMapping().values()), DatasetMain.getInstance().getIndexSearcher(), topics);
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

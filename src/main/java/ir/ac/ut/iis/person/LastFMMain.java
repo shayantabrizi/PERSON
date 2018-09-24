@@ -51,7 +51,7 @@ public class LastFMMain extends DatasetMain {
         Main.retriever = new LastFMRetriever(openSearcher(), name, null, "/home/shayan/Desktop/Taval/thesis/citedata/crowled/queriesFinal.csv", hier.getUserNodeMapping(), lastFMExtractor.getTrackMap());
         Main.outputPath = "../datasets/lastfm/results/" + name;
 
-        hier.readGraph("/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/friends.csv", false, null);
+        hier.readGraph("/home/shayan/Desktop/Taval/thesis/lastfm/lastdb_small/friends.csv", false, false);
 
         Configs.database_name = "lastdb_small";
     }

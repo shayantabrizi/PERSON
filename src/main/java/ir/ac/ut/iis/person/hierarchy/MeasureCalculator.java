@@ -10,15 +10,15 @@ package ir.ac.ut.iis.person.hierarchy;
  * @author shayan
  */
 public interface MeasureCalculator {
-    @Override
-     String toString();
 
-    @Override
-     int hashCode();
+    String toString();
 
-    @Override
-     boolean equals(Object obj);
+    int hashCode();
+
+    boolean equals(Object obj);
 
     float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level);
     
+    int getSeedsId();
+
 }

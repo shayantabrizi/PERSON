@@ -5,6 +5,8 @@
  */
 package ir.ac.ut.iis.person.hierarchy;
 
+import java.util.Objects;
+
 /**
  *
  * @author shayan
@@ -36,7 +38,7 @@ public class UniformPPR extends PPRCalculator {
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(topicNodeId);
+        return Objects.hash(topicNodeId, alpha);
     }
 
     @Override
@@ -54,6 +56,10 @@ public class UniformPPR extends PPRCalculator {
         if (topicNodeId != other.topicNodeId) {
             return false;
         }
+        if (alpha != other.alpha) {
+            return false;
+        }
+
         return true;
     }
 

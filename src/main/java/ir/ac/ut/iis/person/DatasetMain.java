@@ -12,6 +12,8 @@ import ir.ac.ut.iis.person.hierarchy.User;
 import ir.ac.ut.iis.person.hierarchy.UserFactory;
 import ir.ac.ut.iis.person.myretrieval.CachedIndexSearcher;
 import ir.ac.ut.iis.person.paper.TopicsReader;
+import ir.ac.ut.iis.person.topics.CachedInstanceClassifier;
+import ir.ac.ut.iis.person.topics.InstanceClassifier;
 import ir.ac.ut.iis.retrieval_tools.Config;
 import java.io.Closeable;
 import java.io.File;
@@ -50,6 +52,7 @@ public abstract class DatasetMain implements Closeable {
     private Hierarchy hiers[];
     private static DatasetMain instance;
     protected UserFactory uf;
+    private CachedInstanceClassifier cic;
 
     protected DatasetMain() {
     }
@@ -104,6 +107,13 @@ public abstract class DatasetMain implements Closeable {
 
     public Integer getDF(String word) {
         return getDF(word, true);
+    }
+
+    public CachedInstanceClassifier getCachedInstanceClassifier() {
+        if (cic == null) {
+            cic = new CachedInstanceClassifier(new InstanceClassifier());
+        }
+        return cic;
     }
 
     public Integer getDF(String word, boolean ignoreSmallValues) {

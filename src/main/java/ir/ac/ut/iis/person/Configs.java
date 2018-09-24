@@ -32,9 +32,9 @@ public class Configs {
     public static final String badDocumentsFileName = "badDocuments.txt";   // Just keep it unchanged       
 
     // Fundamental parameters
-    public static String datasetName = "aminer";     // The name of the dataset folder
+    public static String datasetName = "aminer_>2002_again";     // The name of the dataset folder
     public static String datasetRoot = getDatasetRoot();      // The root address of the dataset
-    public static String database_name = "aminerDB";     // The MySQL database name
+    public static String database_name = "aminer_>2002_again";     // The MySQL database name
     public static String databaseTablesPostfix = "";    // Just keep it unchanged
     public static String queryField = "title";          // The field of the query paper used as query. Keep it unchanged
     public static int mapBias = 0;                      // Just keep it unchanged
@@ -46,7 +46,7 @@ public class Configs {
     public static Evaluator evaluator = new PERSONEvaluator();      // Indicates whether to use PERSON or ASPIRE for evaluation
 //    public static Evaluator evaluator = null;
     public static int runNumber = 176;                  // Just a number so one can execute different runs without collision in the files or folders
-    public static String indexName = "index_100_AsymmetricAlpha";      // The name of the index folder
+    public static String indexName = "index_15_SymmetricAlpha";      // The name of the index folder
     public static String queryFile = "general.txt";     // The name of the queries file
 
     // PERSON parameters
@@ -78,10 +78,11 @@ public class Configs {
 
     // Topic parameters
     public static boolean useCachedTopics = true;       // Keep it true
-    public static String topicsName = "100_AsymmetricAlpha";      // The name of the topics folder
-    public static String profileTopicsDBTable = "_100_AsymmetricAlpha";        // Just ignore it
+    public static String topicsName = "15_SymmetricAlpha";      // The name of the topics folder
+    public static String profileTopicsDBTable = "_15_SymmetricAlpha";        // Just ignore it
     public static boolean myCosineWeightType = true;        // Just ignore it
     public static boolean removeCurrentPaperFromAuthorTopics = true;       // Ignore current paper's topics in author's topics. Not necessarily implemented completely
+    public static boolean useDirichletEstimationForAuthorTopics = false;    // Just ignore it
 
     public static String generalParameters() {
         return "NOR=" + numOfResults + ",IQH=" + InappropriateQueriesHeuristic + ",SQ=" + skipQueries + ",QC=" + queryCount + ",NDCGAT=" + ndcgAt + ",USC=" + useSearchCaching;

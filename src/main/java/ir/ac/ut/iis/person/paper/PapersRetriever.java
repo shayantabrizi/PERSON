@@ -214,6 +214,7 @@ public class PapersRetriever extends Retriever {
             }
         } catch (IOException ex) {
             Logger.getLogger(PapersRetriever.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
         }
     }
 
@@ -221,6 +222,8 @@ public class PapersRetriever extends Retriever {
 //        for (int i = 0; i < 200_000; i++) {
 //            Main.random(100);
 //        }
+        File yourFile = new File(queryFile);
+        yourFile.getParentFile().mkdirs();
         Set<Integer> set = new HashSet<>();
         try (Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(queryFile)))) {
             for (int i = 0; i < 400_000; i++) {
@@ -279,6 +282,7 @@ public class PapersRetriever extends Retriever {
             }
         } catch (IOException ex) {
             Logger.getLogger(PapersRetriever.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
         }
     }
 

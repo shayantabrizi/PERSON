@@ -45,10 +45,30 @@ import java.util.regex.Pattern;
  */
 public class InstanceClassifier {
 
-    private final cc.mallet.topics.TopicInferencer inferencer;
+    protected cc.mallet.topics.TopicInferencer inferencer;
     private final SerialPipes serialPipes;
 
     public InstanceClassifier() {
+        this(true);
+    }
+
+    public InstanceClassifier(boolean readInferencer) {
+        if (readInferencer) {
+            inferencer = readInferencer();
+        }
+        serialPipes = readPipes();
+    }
+
+    private cc.mallet.topics.TopicInferencer readInferencer() throws RuntimeException {
+        try {
+            return TopicInferencer.read(new File(Configs.datasetRoot + "topics/" + Configs.topicsName + "/inferencer.mallet"));
+        } catch (Exception ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
+        }
+    }
+
+    private SerialPipes readPipes() throws RuntimeException {
         Alphabet alphabet;
         try (InputStream file = new FileInputStream(Configs.datasetRoot + "topics/" + Configs.topicsName + "/alphabet.txt");
                 InputStream buffer = new BufferedInputStream(file);
@@ -59,12 +79,6 @@ public class InstanceClassifier {
             throw new RuntimeException();
         }
 
-        try {
-            inferencer = TopicInferencer.read(new File(Configs.datasetRoot + "topics/" + Configs.topicsName + "/inferencer.mallet"));
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException();
-        }
         // Begin by importing documents from text to feature sequences
         ArrayList<Pipe> pipeList = new ArrayList<>();
 
@@ -73,8 +87,7 @@ public class InstanceClassifier {
         pipeList.add(new CharSequence2TokenSequence(Pattern.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
         pipeList.add(new TokenSequenceRemoveStopwords(new File(this.getClass().getResource("/stoplists/en.txt").getFile()), "UTF-8", false, false, false));
         pipeList.add(new TokenSequence2FeatureSequence(alphabet));
-        serialPipes = new SerialPipes(pipeList);
-
+        return new SerialPipes(pipeList);
     }
 
     public static void main(String[] args) {
@@ -101,10 +114,6 @@ public class InstanceClassifier {
     }
 
     public float[] getQueryTopics(String query) {
-        return getQueryTopics(query, inferencer);
-    }
-
-    public float[] getQueryTopics(String query, cc.mallet.topics.TopicInferencer inferencer) {
         List<String> tokenizeString = PapersRetriever.tokenizeString(query);
         StringBuilder sb = new StringBuilder();
         for (String s : tokenizeString) {
@@ -148,6 +157,9 @@ public class InstanceClassifier {
 
     public Integer getTopClass(String query) {
         return getTopClasses(getQueryTopics(query), 1).iterator().next();
+    }
+
+    public void setPriors(float[] priorTopics) {
     }
 
 }
