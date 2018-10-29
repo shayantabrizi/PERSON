@@ -74,7 +74,7 @@ public class PapersRetriever extends Retriever {
         super(name, evaluator);
         this.rootSearcher = indexSearcher;
         this.rootReader = indexSearcher.getIndexReader();
-        if (Configs.runStage.equals(Configs.RunStage.NORMAL)) {
+        if (Configs.runStage.equals(Configs.RunStage.NORMAL) || Configs.runStage.equals(Configs.RunStage.CREATE_METHOD_BASED_JUDGMENTS)) {
             try {
                 this.scanner = new Scanner(new FileInputStream(quriesFile));
             } catch (FileNotFoundException ex) {
@@ -358,17 +358,17 @@ public class PapersRetriever extends Retriever {
             boolean ignoreQuery = true;
             for (Iterator<Query.Result> t = r.getValue().iterator(); t.hasNext();) {
                 Query.Result next = t.next();
+                i++;
+                if (i == Configs.numOfResults + 1) {
+                    t.remove();
+                    continue;
+                }
                 if (next.getDocId() == query.getQueryIndexId()) {
                     if (Configs.InappropriateQueriesHeuristic) {
 //                        if (r.getKey().equals("02-LM")) {
                         ignoreQuery = false;
 //                        }
                     }
-                    t.remove();
-                    continue;
-                }
-                i++;
-                if (i == Configs.numOfResults + 1) {
                     t.remove();
                     continue;
                 }

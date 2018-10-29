@@ -16,12 +16,13 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.tuple.Triple;
 
 /**
  *
@@ -158,6 +159,74 @@ public class GiantComponentSelector {
         writer.write(next2 + "\n");
         writer.write(refs + "\n");
         writer.write(authors + "\n");
+    }
+
+    public void convertAuthorsFile(String papersFile, String outputFileName, Map<Long, String> authorNames) {
+        Map<Long, Author> graph = new TreeMap<>();
+        try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(papersFile)))) {
+            sc.useDelimiter("\n");
+            while (sc.hasNext()) {
+                Paper readPaper = readPaper(sc);
+                for (Long author : readPaper.authors) {
+                    for (Long author2 : readPaper.authors) {
+                        if (author < author2) {
+                            Author get = graph.get(author);
+                            if (get == null) {
+                                get = new Author(authorNames.get(author));
+                                graph.put(author, get);
+                            }
+                            Integer get1 = get.edges.get(author2);
+                            if (get1 == null) {
+                                get1 = 1;
+                                get.edges.put(author2, get1);
+                            } else {
+                                get.edges.put(author2, get1 + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
+        }
+        try (Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outputFileName)))) {
+            for (Map.Entry<Long, Author> e : graph.entrySet()) {
+                String conv = "";
+                for (Map.Entry<Long, Integer> e2 : e.getValue().edges.entrySet()) {
+                    conv += e2.getKey() + " " + (double) e2.getValue() + ",";
+                }
+
+                writer.write(e.getKey() + "\n");
+                writer.write(e.getValue().name + "\n");
+                writer.write(conv + "\n");
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
+        } catch (IOException ex) {
+            Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private Map<Long, String> readAuthorNames(String authorsFile) {
+        Map<Long, String> map = new HashMap<>();
+        try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(authorsFile)))) {
+            sc.useDelimiter("\n");
+
+            while (sc.hasNext()) {
+                String nextLine = sc.next();
+                Long id = Long.parseLong(nextLine);
+                String name = sc.next();
+                String rels = sc.next();
+                map.put(id, name);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GiantComponentSelector.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
+        }
+        return map;
     }
 
     public void convertAuthorsFile(String authorsFile, String outputFileName, Set<Long> authorsSet) {
@@ -300,7 +369,11 @@ public class GiantComponentSelector {
                 throw new RuntimeException();
             }
 
-            convertAuthorsFile(authorsFileName, "authors_giant.txt.tmp3_" + i, authorsSet);
+            if (isPaperBasedAuthors) {
+                convertAuthorsFile("papers_giant.txt.tmp3_" + i, "authors_giant.txt.tmp3_" + i, readAuthorNames(authorsFileName));
+            } else {
+                convertAuthorsFile(authorsFileName, "authors_giant.txt.tmp3_" + i, authorsSet);
+            }
             if (i > 0) {
                 new File(papersFileName).delete();
                 new File(authorsFileName).delete();
@@ -384,32 +457,22 @@ public class GiantComponentSelector {
     }
 
     public static <T extends Number> Set<T> getGiantComponent(Map<T, Set<T>> graph) {
-        Map<T, Integer> visited = new HashMap<>();
-        int compId = 0;
-        for (T id : graph.keySet()) {
-            if (!visited.containsKey(id)) {
-                bfs(id, compId, visited, graph);
-                compId++;
+        Triple<Map<T, Integer>, Map<Integer, Integer>, Integer> res = new ConnectedComponentsExtractor<T>() {
+
+            @Override
+            protected Set<T> getNeighbors(T currentNode) {
+                return graph.get(currentNode);
             }
-        }
-        Map<Integer, Integer> counts = new HashMap<>();
-        int max = 0;
-        int maxId = 0;
-        for (Map.Entry<T, Integer> e : visited.entrySet()) {
-            Integer get = counts.get(e.getValue());
-            if (get == null) {
-                get = 0;
+
+            @Override
+            protected Set<T> getNodes() {
+                return graph.keySet();
             }
-            get++;
-            if (get > max) {
-                max = get;
-                maxId = e.getValue();
-            }
-            counts.put(e.getValue(), get);
-        }
+
+        }.getConnectedComponents();
         Set<T> giantComponent = new HashSet<>();
-        for (Map.Entry<T, Integer> e : visited.entrySet()) {
-            if (e.getValue().equals(maxId)) {
+        for (Map.Entry<T, Integer> e : res.getLeft().entrySet()) {
+            if (e.getValue().equals(res.getRight())) {
                 giantComponent.add(e.getKey());
             }
         }
@@ -449,18 +512,13 @@ public class GiantComponentSelector {
         get.add(id);
     }
 
-    public static <T extends Number> void bfs(T src, int compId, Map<T, Integer> visited, Map<T, Set<T>> graph) {
-        LinkedList<T> list = new LinkedList<>();
-        list.add(src);
-        visited.put(src, compId);
-        while (!list.isEmpty()) {
-            T currentnode = list.removeFirst();
-            for (T n : graph.get(currentnode)) {
-                if (!visited.containsKey(n)) {
-                    visited.put(n, compId);
-                    list.add(n);
-                }
-            }
+    private static class Author {
+
+        Map<Long, Integer> edges = new HashMap<>();
+        String name;
+
+        public Author(String name) {
+            this.name = name;
         }
     }
 }
