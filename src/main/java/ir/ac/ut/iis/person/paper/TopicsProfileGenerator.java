@@ -5,6 +5,8 @@
  */
 package ir.ac.ut.iis.person.paper;
 
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Floats;
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.algorithms.social_textual.MySQLConnector;
 import ir.ac.ut.iis.person.datasets.citeseerx.PapersExtractor;
@@ -18,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -26,6 +29,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RList;
+import org.rosuda.JRI.Rengine;
 
 /**
  *
@@ -34,9 +40,18 @@ import org.apache.lucene.search.TopDocs;
 public class TopicsProfileGenerator implements Closeable {
 
     protected final Connection conn;
+    private final boolean useDirichletEstimation;
+    private Rengine re;
 
-    public TopicsProfileGenerator(String databaseName) {
+    public TopicsProfileGenerator(String databaseName, boolean useDirichletEstimation) {
         this.conn = MySQLConnector.connect(databaseName);
+        this.useDirichletEstimation = useDirichletEstimation;
+        if (useDirichletEstimation) {
+            re = new Rengine(new String[]{"--vanilla"}, false, null);
+            if (!re.waitForR()) {
+                throw new RuntimeException();
+            }
+        }
     }
 
     public void generateTopicsProfile(Set<GraphNode> users, IndexSearcher searcher, Map<String, float[]> topics) {
@@ -60,8 +75,11 @@ public class TopicsProfileGenerator implements Closeable {
                 for (String authorId : split) {
                     UserData get = map.get(Integer.parseInt(authorId));
                     get.docCount++;
-                    float[] userTopics = get.u.getTopics();
                     float[] value = d.getValue();
+                    if (useDirichletEstimation) {
+                        get.docs.add(value);
+                    }
+                    float[] userTopics = get.u.getTopics();
                     for (int i = 0; i < length; i++) {
                         userTopics[i] += value[i];
                     }
@@ -78,11 +96,20 @@ public class TopicsProfileGenerator implements Closeable {
                 pstmt.setInt(1, u.u.getId());
                 pstmt.setInt(3, u.docCount);
 
+                float[] userTopics = u.u.getTopics();
                 for (int i = 0; i < length; i++) {
-                    float[] userTopics = u.u.getTopics();
                     userTopics[i] /= u.docCount;
                 }
-                byte[] toByteArray = toByteArray(u.u.getTopics());
+                if (useDirichletEstimation) {
+                    float[] userTopics2 = estimateTopicsByDirichlet(u.docs);
+                    if (userTopics2 != null) {
+                        userTopics = userTopics2;
+                    }
+//                    System.out.println("T0: " + u.docCount);
+//                    System.out.println("T1: " + Arrays.toString(userTopics));
+//                    System.out.println("T2: " + Arrays.toString(userTopics2));
+                }
+                byte[] toByteArray = toByteArray(userTopics);
                 pstmt.setBytes(2, toByteArray);
 
                 pstmt.execute();
@@ -132,9 +159,84 @@ public class TopicsProfileGenerator implements Closeable {
 
     @Override
     public void close() throws IOException {
+//        System.out.println("CNT: " + cnt1 + " " + cnt2 + " " + cnt3 + " " + cnt4 + " ");
         try {
             conn.close();
+            if (re != null) {
+                re.end();
+            }
         } catch (SQLException ex) {
+            Logger.getLogger(TopicsProfileGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
+        }
+    }
+
+    public static REXP toRmatrix(Rengine r, double[][] matrix, String assign) {
+        REXP resultat = null;
+        if (matrix.length > 0) {
+            r.assign(assign, matrix[0]);
+            resultat = r.eval(assign + " <- matrix( " + assign + " ,nr=1)");
+        } else {
+            return null;
+        }
+        for (int i = 1; i < matrix.length; i++) {
+            r.assign("intermediaire", matrix[i]);
+            resultat = r.eval(assign + " <- rbind(" + assign + ",matrix(intermediaire,nr=1))");
+        }
+        return resultat;
+    }
+
+    private float[] estimateTopicsByDirichlet(Set<float[]> map) {
+//        boolean check = true;
+        if (map.size() == 1) {
+            return map.iterator().next();
+        }
+//        for (float[] a : map) {
+//            if (!Arrays.equals(a, next)) {
+//                check = false;
+//                break;
+//            }
+//        }
+//        if (check) {
+//            if (map.size() == 1) {
+//                cnt1++;
+//            } else {
+//                cnt2++;
+//            }
+//            return next;
+//        }
+        final int length = map.iterator().next().length;
+        double[][] arr = new double[map.size()][length];
+        int i = 0;
+        for (float[] m : map) {
+            for (int j = 0; j < length; j++) {
+                arr[i][j] = m[j];
+            }
+            i++;
+        }
+        REXP toRmatrix = toRmatrix(re, arr, "test");
+
+        REXP x = re.eval("sirt::dirichlet.mle(test)");
+        if (x == null) {
+//            cnt3++;
+            return null;
+        }
+        final RList asList = x.asList();
+//        if (cnt1 < 100) {
+//            System.out.println(asList.at(1).asDouble());
+//        }
+        float[] asFloatArray = Floats.toArray(Doubles.asList(asList.at(2).asDoubleArray()));
+//        cnt4++;
+        return asFloatArray;
+    }
+
+    public static void main() {
+        try (TopicsProfileGenerator topicsProfileGenerator = new TopicsProfileGenerator("", true)) {
+            Set<float[]> map = new HashSet<>();
+            map.add(new float[]{.1f, .2f, .7f});
+            map.add(new float[]{.2f, .3f, .5f});
+            topicsProfileGenerator.estimateTopicsByDirichlet(map);
+        } catch (IOException ex) {
             Logger.getLogger(TopicsProfileGenerator.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException();
         }
@@ -144,6 +246,7 @@ public class TopicsProfileGenerator implements Closeable {
 
         IUser u;
         int docCount = 0;
+        Set<float[]> docs = new HashSet<>();
 
         private UserData(IUser u) {
             this.u = u;
