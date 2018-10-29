@@ -32,7 +32,7 @@ public class RandomNeighborFilteringSearcher extends BasicSearcher {
     }
 
     @Override
-    public List<Query.Result> search(Query q, int numOfResults) {
+    public List<Query.Result> doSearch(Query q, int numOfResults) {
         List<Query.Result> search = super.search(q, Math.round(Math.min(numOfResults, numOfResults * Configs.ratioOfCandidateToResults - 2)));
         Set<Integer> set = new HashSet<>();
         for (Query.Result r : search) {

@@ -464,7 +464,7 @@ public class ResultConverter {
         }
 
         int n = ndcgs1.size();
-        double tau = 2 * (concordants - discordants) / Math.sqrt((n * (n - 1) - Tx) * (n * (n - 1) - Ty));
+        double tau = 2 * (concordants - discordants) / Math.sqrt(((long)(n * (n - 1) - Tx)) * (n * (n - 1) - Ty));
 
         int delta = Integer.MIN_VALUE;       // To show a problem
         if (concordants - discordants > 0) {

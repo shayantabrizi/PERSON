@@ -16,7 +16,11 @@ import ir.ac.ut.iis.person.myretrieval.MyDummySimilarity;
 import ir.ac.ut.iis.person.myretrieval.MyQuery;
 import ir.ac.ut.iis.person.query.QueryConverter;
 import ir.ac.ut.iis.person.query.QueryConverter.ParsedQuery;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +42,7 @@ import org.apache.lucene.search.similarities.Similarity;
  */
 public class BasicSearcher extends Searcher {
 
+    Writer writer;
     protected final IndexSearcher searcher;
     private final StandardQueryParser parser;
     private final Similarity similarity;
@@ -50,6 +55,16 @@ public class BasicSearcher extends Searcher {
 
     public BasicSearcher(IndexSearcher searcher, String name, Similarity similarity, QueryConverter queryConverter) {
         super(name, queryConverter);
+        if (Configs.runStage.equals(Configs.RunStage.CREATE_METHOD_BASED_JUDGMENTS)) {
+            try {
+                this.writer = new OutputStreamWriter(new FileOutputStream(name + "-queries.txt"));
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(BasicSearcher.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RuntimeException();
+            }
+        } else {
+            this.writer = null;
+        }
         this.searcher = searcher;
         this.similarity = similarity;
         parser = new StandardQueryParser(new DatasetMain.MyAnalyzer());
@@ -66,6 +81,35 @@ public class BasicSearcher extends Searcher {
 
     @Override
     public List<ir.ac.ut.iis.person.query.Query.Result> search(ir.ac.ut.iis.person.query.Query q, int numOfResults) {
+        List<ir.ac.ut.iis.person.query.Query.Result> doSearch = doSearch(q, numOfResults);
+        if (Configs.runStage.equals(Configs.RunStage.CREATE_METHOD_BASED_JUDGMENTS)) {
+            try {
+                writer.write(q.getQueryId() + "," + q.getSearcher() + ",");
+                int count = 100;
+                for (ir.ac.ut.iis.person.query.Query.Result r : doSearch) {
+                    writer.write(r.getDocId() + " ");
+                    count--;
+                    if (count == 0) {
+                        break;
+                    }
+                }
+                writer.write(",");
+                if (q.getIgnoredResults() != null) {
+                    for (String r : q.getIgnoredResults()) {
+                        writer.write(r + " ");
+                    }
+                }
+                writer.write("\n");
+                writer.flush();
+            } catch (IOException ex) {
+                Logger.getLogger(BasicSearcher.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RuntimeException();
+            }
+        }
+        return doSearch;
+    }
+
+    protected List<ir.ac.ut.iis.person.query.Query.Result> doSearch(ir.ac.ut.iis.person.query.Query q, int numOfResults) throws IgnoreQueryEx, RuntimeException {
         ParsedQuery convertedQuery = getQueryConverter().run(q);
         if (convertedQuery.query.isEmpty()) {
             throw new IgnoreQueryEx();

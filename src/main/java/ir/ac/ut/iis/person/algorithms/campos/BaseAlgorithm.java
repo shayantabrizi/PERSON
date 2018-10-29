@@ -28,7 +28,7 @@ public abstract class BaseAlgorithm extends BasicSearcher {
     }
 
     @Override
-    public List<Query.Result> search(Query q, int numOfResults) {
+    public List<Query.Result> doSearch(Query q, int numOfResults) {
         QueryConverter.ParsedQuery convertedQuery = getQueryConverter().run(q);
 
         TopDocs orig = super.doSearch(convertedQuery, q, numOfResults).td;

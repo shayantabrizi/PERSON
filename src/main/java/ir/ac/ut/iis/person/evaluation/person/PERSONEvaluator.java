@@ -41,8 +41,8 @@ import org.apache.lucene.search.similarities.ClassicSimilarity;
  */
 public class PERSONEvaluator implements Evaluator {
 
-    private IndexSearcher searcher;
-    private Profile profileCache;
+    protected IndexSearcher searcher;
+    protected Profile profileCache;
 
     protected Map<String, Double> findRelevants(String docId, Integer year, Set<String> ignoredSelfCitations) {
         searcher.setSimilarity(new ClassicSimilarity());

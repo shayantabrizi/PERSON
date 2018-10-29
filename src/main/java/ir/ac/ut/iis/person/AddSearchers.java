@@ -277,11 +277,12 @@ public class AddSearchers {
 //        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.55", baseSimilarity, queryConverter, .55f, .45f));
 //        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), "AggregateTFIDF-.65", baseSimilarity, queryConverter, .65f, .35f));
         if (all) {
-            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .85f, .15f));
-            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .75f, .25f));
-            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .7f, .3f));
+            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .65f, .35f));
+            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .55f, .45f));
+            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .45f, .55f));
+            retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .35f, .65f));
         }
-        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .8f, .2f));
+        retriever.addSearcher(new AggregateSearcher(myValueSource, DatasetMain.getInstance().getIndexSearcher(), myValueSource.getName(), new ClassicSimilarity(), queryConverter, .75f, .25f));
 //                retriever.addSearcher(new AggregateSearcher(myValueSourceNoPenalization, hiers[0].getRootNode().getSearcher(), "AggregateTFIDF-.25-myValueSourceNoPenalization", new DefaultSimilarity(), queryConverter, .25f, .75f, docIdMap));
 //                retriever.addSearcher(new AggregateSearcher(myValueSourceNoUseUserWeight, hiers[0].getRootNode().getSearcher(), "AggregateTFIDF-.25-myValueSourceNoUseUserWeight", new DefaultSimilarity(), queryConverter, .25f, .75f, docIdMap));
 //                retriever.addSearcher(new AggregateSearcher(myValueSourceNoUseFriendWeight, hiers[0].getRootNode().getSearcher(), "AggregateTFIDF-.25-myValueSourceNoUseFriendWeight", new DefaultSimilarity(), queryConverter, .25f, .75f, docIdMap));
