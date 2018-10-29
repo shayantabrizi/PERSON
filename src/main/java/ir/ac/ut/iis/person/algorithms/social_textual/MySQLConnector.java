@@ -16,6 +16,7 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 public class MySQLConnector {
+
     private static final String serverAddress = "localhost:3306";
     private static final String username = "root";
     private static final String password = "";
@@ -27,18 +28,18 @@ public class MySQLConnector {
 
         try {
 // Load the JDBC driver
-            String driverName = "com.mysql.jdbc.Driver"; // MySQL MM JDBC driver
+//            String driverName = "com.mysql.jdbc.Driver"; // MySQL MM JDBC driver
             //String driverName = "com.mysql.jdbc.Driver";
-            Class.forName(driverName);
+//            Class.forName(driverName);
 
 // Create a connection to the database
             String url = "jdbc:mysql://" + serverAddress + "/" + database_name + "?verifyServerCertificate=false&useSSL=true"; // a JDBC url
             conn = DriverManager.getConnection(url, username, password);
-        } catch (ClassNotFoundException e) {
-            System.out.println("class not found exception:");
-            e.printStackTrace();
-            throw new RuntimeException();
-// Could not find the database driver
+//        } catch (ClassNotFoundException e) {
+//            System.out.println("class not found exception:");
+//            e.printStackTrace();
+//            throw new RuntimeException();
+//// Could not find the database driver
         } catch (SQLException e) {
             System.out.println("SQL exception (could not find database");
             e.printStackTrace();

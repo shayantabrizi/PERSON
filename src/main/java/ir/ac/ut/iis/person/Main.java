@@ -5,6 +5,7 @@
 package ir.ac.ut.iis.person;
 
 import ir.ac.ut.iis.person.base.Retriever;
+import ir.ac.ut.iis.person.paper.TopicsProfileGenerator;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -92,6 +93,11 @@ public class Main {
 
     public static void expCompare() {
         Configs.onlyQueriesWhoseAuthorHasMoreThan_THIS_Papers = 1;
+        Configs.baseSimilarityName = "TF-IDF";
+        Configs.ignoreSelfCitations = true;
+        Configs.useSearchCaching = false;
+        Configs.selfConsiderConstant = 0;
+        AddSearchers.reinitialize();
         try (PapersMain main = new PapersMain()) {
             main.main("C");
             AddSearchers.addBaseline();
@@ -102,9 +108,12 @@ public class Main {
     }
 
     public static void expRobustness() {
+        Configs.baseSimilarityName = "TF-IDF";
+        Configs.ignoreSelfCitations = true;
+        Configs.useSearchCaching = false;
         try (PapersMain main = new PapersMain()) {
             main.main("R");
-            AddSearchers.addBaseline();
+//            AddSearchers.addBaseline();
             AddSearchers.addAggregateSearchers(true);
             retrieve();
         }
