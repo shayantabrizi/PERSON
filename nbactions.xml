@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.4.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xmx8000m -XX:+UseCompressedOops -classpath %classpath ${packageClassName}</exec.args>
+                <exec.args>-Xmx8000m -XX:+UseCompressedOops -Djava.library.path=/home/shayan/R/x86_64-pc-linux-gnu-library/3.4/rJava/jri/ -classpath %classpath ${packageClassName}</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.4.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xmx8000m -XX:+UseCompressedOops -classpath %classpath ${packageClassName}</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Xmx8000m -XX:+UseCompressedOops -Djava.library.path=/home/shayan/R/x86_64-pc-linux-gnu-library/3.4/rJava/jri/ -classpath %classpath ${packageClassName}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.4.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xmx8000m -XX:+UseCompressedOops -classpath %classpath ${packageClassName}</exec.args>
+                <exec.args>-Xmx8000m -XX:+UseCompressedOops -Djava.library.path=/home/shayan/R/x86_64-pc-linux-gnu-library/3.4/rJava/jri/ -classpath %classpath ${packageClassName}</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
