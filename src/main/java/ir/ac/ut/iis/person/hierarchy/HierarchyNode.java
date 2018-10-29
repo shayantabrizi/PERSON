@@ -19,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,6 +62,19 @@ public class HierarchyNode {
     public HierarchyNode(Hierarchy hier, HierarchyNode parent) {
         this.parent = parent;
         this.hier = hier;
+    }
+
+    public boolean isEqualToOrAncestorOf(HierarchyNode h) {
+        if (h.equals(this)) {
+            return true;
+        }
+        while (h.getParent() != null) {
+            h = h.getParent();
+            if (h.equals(this)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Iterable<GraphNode> getUsers() {
@@ -238,13 +252,13 @@ public class HierarchyNode {
         return hier.getNumberOfWeights();
     }
 
-    public float[] selfPPR() {
-        return selfPPR(new UniformPPR(id, getUsers(), usersNum(), Configs.pagerankAlpha));
+    public float[] selfPPR(double pageRankAlpha) {
+        return selfPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha);
     }
 
-    public float[] selfPPR(PPRCalculator pprCalculator) {
+    public float[] selfPPR(PPRCalculator pprCalculator, double pageRankAlpha) {
         if (pprCalculator == null) {
-            return selfPPR();
+            return selfPPR(pageRankAlpha);
         }
         float[] get = selfPPR.get(pprCalculator);
         if (get != null) {
@@ -276,7 +290,7 @@ public class HierarchyNode {
         selfPPR.put(pprCalculator, temp);
 
         for (GraphNode u : getUsers()) {
-            float[] userPPR = userPPR(pprCalculator, u);
+            float[] userPPR = userPPR(pprCalculator, pageRankAlpha, u);
             for (int i = 0; i < numOfWeights; i++) {
                 temp[i] += userPPR[i];
             }
@@ -286,10 +300,10 @@ public class HierarchyNode {
         return temp;
     }
 
-    public static float[] getSelfPPRFromDB(short hierarchyNodeId, int numOfWeights) throws RuntimeException {
+    public static float[] getSelfPPRFromDB(short hierarchyNodeId, int numOfWeights, float pageRankAlpha) throws RuntimeException {
         try {
             if (selectSelfStatement == null) {
-                loadSelectSelfStatement(numOfWeights);
+                loadSelectSelfStatement(numOfWeights, pageRankAlpha);
             }
             selectSelfStatement.setString(1, String.valueOf(hierarchyNodeId));
             ResultSet executeQuery = selectSelfStatement.executeQuery();
@@ -308,18 +322,18 @@ public class HierarchyNode {
         return null;
     }
 
-    protected static void loadSelectSelfStatement(int numOfWeights) throws SQLException {
+    protected static void loadSelectSelfStatement(int numOfWeights, double pageRankAlpha) throws SQLException {
         Connection conn = MySQLConnector.connect(Configs.database_name);
-        selectSelfStatement = conn.prepareStatement("select PPR from `PPR_self_" + numOfWeights + "_" + Configs.pagerankAlpha + Configs.databaseTablesPostfix + "` where hierarchyNode_id=?");
+        selectSelfStatement = conn.prepareStatement("select PPR from `PPR_self_" + numOfWeights + "_" + pageRankAlpha + Configs.databaseTablesPostfix + "` where hierarchyNode_id=?");
     }
 
-    public float[] userPPR(GraphNode node) {
-        return userPPR(new UniformPPR(id, getUsers(), usersNum(), Configs.pagerankAlpha), node);
+    public float[] userPPR(GraphNode node, double pageRankAlpha) {
+        return userPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha, node);
     }
 
-    public float[] userPPR(PPRCalculator pprCalculator, GraphNode node) {
+    public float[] userPPR(PPRCalculator pprCalculator, double pageRankAlpha, GraphNode node) {
         if (pprCalculator == null) {
-            return userPPR(node);
+            return userPPR(node, pageRankAlpha);
         }
         if (parent == null) {
             System.out.println("null parent occured");
@@ -339,7 +353,7 @@ public class HierarchyNode {
 //        return uniformVector.PPR(hier.getNumberOfWeights(), node, getUsers(), usersNum(), level);
     }
 
-    public static float[] getUserPPRFromDB(short hierarchyNodeId, int numOfWeights, GraphNode node) throws RuntimeException {
+    public static float[] getUserPPRFromDB(short hierarchyNodeId, int numOfWeights, GraphNode node, double pageRankAlpha) throws RuntimeException {
         /*        try {
             PreparedStatement selectUserStatement = selectUserStatements.get(hierarchyNodeId);
             if (selectUserStatement == null) {
@@ -347,9 +361,9 @@ public class HierarchyNode {
                     loadSelectSelfStatement(numOfWeights);
                 }
                 Connection connection = selectSelfStatement.getConnection();
-                ResultSet tables = connection.getMetaData().getTables(null, null, Configs.database_name + ".PPR_user_" + numOfWeights + "_" + Configs.pagerankAlpha + "_" + hierarchyNodeId, null);
+                ResultSet tables = connection.getMetaData().getTables(null, null, Configs.database_name + ".PPR_user_" + numOfWeights + "_" + pageRankAlpha + "_" + hierarchyNodeId, null);
                 if (tables.next()) {
-                    selectUserStatement = connection.prepareStatement("select PPR from `PPR_user_" + numOfWeights + "_" + Configs.pagerankAlpha + "_" + hierarchyNodeId + Configs.databaseTablesPostfix + "` where node_id=?");
+                    selectUserStatement = connection.prepareStatement("select PPR from `PPR_user_" + numOfWeights + "_" + pageRankAlpha + "_" + hierarchyNodeId + Configs.databaseTablesPostfix + "` where node_id=?");
                     selectUserStatements.put(hierarchyNodeId, selectUserStatement);
                 }
             }
@@ -382,6 +396,24 @@ public class HierarchyNode {
         }
     }
 
+    public void pruneMeasures(int ratio) {
+        if (parent != null && this.usersNum() * ratio < parent.usersNum() && !selfPPR.isEmpty()) {
+            selfPPR.clear();
+            System.out.println("Removing measures for: " + this.getId());
+            for (GraphNode g : parent.getUsers()) {
+                for (Iterator<Map.Entry<MeasureCalculator, float[]>> it = g.getMeasure().entrySet().iterator(); it.hasNext();) {
+                    Map.Entry<MeasureCalculator, float[]> ii = it.next();
+                    if (ii.getKey().getSeedsId() == this.getId()) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+        for (HierarchyNode c : children.values()) {
+            c.pruneMeasures(ratio);
+        }
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -407,4 +439,13 @@ public class HierarchyNode {
         return true;
     }
 
+    public void eagerPPR(int sizeThreshold, double pageRankAlpha) {
+        if (usersNum() < sizeThreshold) {
+            return;
+        }
+        selfPPR(pageRankAlpha);
+        for (HierarchyNode c : getChildren().values()) {
+            c.eagerPPR(sizeThreshold, pageRankAlpha);
+        }
+    }
 }

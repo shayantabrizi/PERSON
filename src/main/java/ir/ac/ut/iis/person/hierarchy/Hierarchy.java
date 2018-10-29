@@ -37,6 +37,7 @@ public class Hierarchy<U extends User> {
     private final Int2ObjectOpenHashMap<GraphNode> userNodeMapping = new Int2ObjectOpenHashMap<>();
     private final String name;
     private int numberOfWeights;
+    private Thread thread;
 
     public Hierarchy(String name) {
         this.name = name;
@@ -69,7 +70,7 @@ public class Hierarchy<U extends User> {
             }
         });
         if (Configs.loadGraph) {
-            this.readGraph(graphFile, false, null);
+            this.readGraph(graphFile, false, false);
         }
     }
 
@@ -216,32 +217,32 @@ public class Hierarchy<U extends User> {
         return hierarchyNodesChildFirst;
     }
 
-    public void readGraph(String graphFileName, boolean ignoreLastWeight, String multiLayerMappingFile) {
-        Logger.getLogger(Hierarchy.class.getName()).log(Level.INFO, "Reading graph started.");
-        if (multiLayerMappingFile != null) {
-            try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(multiLayerMappingFile)))) {
-                UserWithIdentities user;
-                while (sc.hasNextLine()) {
-                    String[] nextLine = sc.nextLine().split(",");
-                    int uid = Integer.parseInt(nextLine[0]);
-                    GraphNode u = userNodeMapping.get(uid);
-                    for (int i = 1; i < nextLine.length; i += 3) {
-                        int topic = Integer.parseInt(nextLine[i]);
-                        int id = Integer.parseInt(nextLine[i + 1]);
-                        float weight = Float.parseFloat(nextLine[i + 2]);
-                        GraphNode identity = userNodeMapping.get(id);
-                        Identity iden = (Identity) identity.getId();
-                        iden.setTopic(topic);
-                        iden.setUser(u.getId());
-                        iden.setWeight(weight);
-                        ((UserWithIdentities) u.getId()).addIdentity(topic, iden);
-                    }
+    public void readMultiLayerMapping(String multiLayerMappingFile) {
+        try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(multiLayerMappingFile)))) {
+            while (sc.hasNextLine()) {
+                String[] nextLine = sc.nextLine().split(",");
+                int uid = Integer.parseInt(nextLine[0]);
+                GraphNode u = userNodeMapping.get(uid);
+                for (int i = 1; i < nextLine.length; i += 3) {
+                    int topic = Integer.parseInt(nextLine[i]);
+                    int id = Integer.parseInt(nextLine[i + 1]);
+                    float weight = Float.parseFloat(nextLine[i + 2]);
+                    GraphNode identity = userNodeMapping.get(id);
+                    Identity iden = (Identity) identity.getId();
+                    iden.setTopic(topic);
+                    iden.setUser(u.getId());
+                    iden.setWeight(weight);
+                    ((UserWithIdentities) u.getId()).addIdentity(topic, iden);
                 }
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Hierarchy.class.getName()).log(Level.SEVERE, null, ex);
-                throw new RuntimeException();
             }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Hierarchy.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
         }
+    }
+
+    public void readGraph(String graphFileName, boolean ignoreLastWeight, boolean isDirected) {
+        Logger.getLogger(Hierarchy.class.getName()).log(Level.INFO, "Reading graph started.");
         boolean isChanged = false;
         try (Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(graphFileName)))) {
             while (sc.hasNextLine()) {
@@ -294,7 +295,9 @@ public class Hierarchy<U extends User> {
 
                 edge.hierarchyThreshold = temp1.getLevel();
                 node1.addEdge(edge);
-                node2.addEdge(edge);
+                if (!isDirected) {
+                    node2.addEdge(edge);
+                }
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Hierarchy.class.getName()).log(Level.SEVERE, null, ex);
@@ -317,6 +320,23 @@ public class Hierarchy<U extends User> {
         rootNode.addUser(user);
         userNodeMapping.put(id, user);
         return user;
+    }
+
+    public void eagerPPR(int sizeThreshold, double pageRankAlpha) {     // Do not use. Because tmpArray in User is shared among different PPR computations, multithreaded computation is currently not possible.
+        thread = new Thread(() -> {
+            rootNode.eagerPPR(sizeThreshold, pageRankAlpha);
+        });
+        thread.start();
+    }
+
+    public void join() {
+        try {
+            thread.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Hierarchy.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
+        }
+        thread = null;
     }
 
 }
