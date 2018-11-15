@@ -54,15 +54,15 @@ public class UserWithIdentities implements IUser {
         return identities;
     }
 
-    @Override
-    public float[] getTmpArray() {
-        return user.getTmpArray();
-    }
-
-    @Override
-    public void setTmpArray(float[] tmpArray) {
-        user.setTmpArray(tmpArray);
-    }
+//    @Override
+//    public float[] getTmpArray() {
+//        return user.getTmpArray();
+//    }
+//
+//    @Override
+//    public void setTmpArray(float[] tmpArray) {
+//        user.setTmpArray(tmpArray);
+//    }
 
     @Override
     public float[] getTopics() {

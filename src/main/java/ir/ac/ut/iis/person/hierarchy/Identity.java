@@ -86,15 +86,15 @@ public class Identity implements IUser {
         return id;
     }
 
-    @Override
-    public float[] getTmpArray() {
-        return tmpArray;
-    }
-
-    @Override
-    public void setTmpArray(float[] tmpArray) {
-        this.tmpArray = tmpArray;
-    }
+//    @Override
+//    public float[] getTmpArray() {
+//        return tmpArray;
+//    }
+//
+//    @Override
+//    public void setTmpArray(float[] tmpArray) {
+//        this.tmpArray = tmpArray;
+//    }
 
     @Override
     public float[] getTopics() {

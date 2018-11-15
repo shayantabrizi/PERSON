@@ -15,7 +15,7 @@ public class User implements Comparable<IUser>, IUser {
 
     int id;
     private float[] topics;
-    private float[] tmpArray;
+//    private float[] tmpArray;
 
     public User(int id) {
         this.id = id;
@@ -26,20 +26,21 @@ public class User implements Comparable<IUser>, IUser {
         return id;
     }
 
+//    @Override
+//    public void setTmpArray(float[] tmpArray) {
+//        this.tmpArray = tmpArray;
+//    }
+//
+//    @Override
+//    public float[] getTmpArray() {
+//        return tmpArray;
+//    }
     @Override
-    public void setTmpArray(float[] tmpArray) {
-        this.tmpArray = tmpArray;
-    }
-
-    @Override
-    public float[] getTmpArray() {
-        return tmpArray;
-    }
-
     public float[] getTopics() {
         return topics;
     }
 
+    @Override
     public void setTopics(float[] topics) {
         this.topics = topics;
     }

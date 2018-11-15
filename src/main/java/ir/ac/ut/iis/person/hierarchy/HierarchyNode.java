@@ -446,20 +446,4 @@ public class HierarchyNode {
         }
         return true;
     }
-
-    public void eagerPPR(int childThreshold, int parentThreshold, double pageRankAlpha) {
-        if (usersNum() < childThreshold || parent.usersNum() < parentThreshold) {
-            return;
-        }
-        if (parent != null && parent.usersNum() > 400_000) {
-            synchronized (HierarchyNode.class) {
-                selfPPR(pageRankAlpha);
-            }
-        } else {
-            selfPPR(pageRankAlpha);
-        }
-        for (HierarchyNode c : getChildren().values()) {
-            c.eagerPPR(childThreshold, parentThreshold, pageRankAlpha);
-        }
-    }
 }

@@ -26,7 +26,7 @@ public class UniformPPR extends PPRCalculator {
     public void updatePPRs(float[] zeroDegrees, double alpha) {
         for (GraphNode u : topic) {
             for (int i = 0; i < zeroDegrees.length; i++) {
-                u.getTmpArray()[i] = (float) (u.getTmpArray()[i] + (alpha + zeroDegrees[i]) * 1. / topicSize);
+                u.getTmpArray()[i] = (float) (u.getTmpArray()[i] + (alpha + zeroDegrees[i] * (1 - alpha)) / topicSize);
             }
         }
     }

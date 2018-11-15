@@ -7,7 +7,6 @@ package ir.ac.ut.iis.person.base;
 
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.Main;
-import ir.ac.ut.iis.person.algorithms.aggregate.MyCustomScoreProvider;
 import ir.ac.ut.iis.person.evaluation.Evaluator;
 import ir.ac.ut.iis.person.hierarchy.User;
 import ir.ac.ut.iis.person.query.Query;
@@ -27,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 
 /**
  *
@@ -65,14 +63,24 @@ public abstract class Retriever implements Closeable {
             QueryBatch queries = nextQueryBatch();
             for (Searcher s : searchers) {
                 System.out.println(s.getName());
-                createQueryAndSearch(queries, s);
-                MyCustomScoreProvider.printStatistics(false);
-                MyCustomScoreProvider.resetStatistics();
+                if (Configs.multiThreaded) {
+                    Threads.addRunnable(() -> {
+                        createQueryAndSearch(queries, s);
+                    }, s.getName());
+                } else {
+                    createQueryAndSearch(queries, s);
+                }
+//                MyCustomScoreProvider.printStatistics(false);
+//                MyCustomScoreProvider.resetStatistics();
 //                if (entry.getValue().size() < Main.numOfResults) {
 //                    throw new IgnoreQueryEx("small resultset: " + s.getName() + ": " + entry.getValue().size());
 //                }
             }
 
+            if (Configs.multiThreaded) {
+                Threads.start();
+                Threads.join();
+            }
 //            if (queries.properQueryCount() == 0) {
 //                throw new IgnoreQueryEx();
 //            }
@@ -93,9 +101,6 @@ public abstract class Retriever implements Closeable {
             System.out.println("query ignored: " + ex.getMessage());
 //            ex.printStackTrace();
             return false;
-        } catch (IOException | QueryNodeException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException();
         }
         //out.close();
     }
@@ -535,7 +540,7 @@ public abstract class Retriever implements Closeable {
         return new Result(statss, totalRelevants, retrievedRelevants, qb);
     }
 
-    protected void createQueryAndSearch(QueryBatch qb, Searcher s) throws QueryNodeException, IOException {
+    protected void createQueryAndSearch(QueryBatch qb, Searcher s) {
         for (Query q : qb) {
             System.out.println(q.getQueryId() + " " + q.getSearcher());
             s.search(q, Configs.numOfResults + 1);

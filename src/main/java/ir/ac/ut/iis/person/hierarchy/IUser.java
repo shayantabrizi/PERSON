@@ -22,9 +22,9 @@ public interface IUser extends Comparable<IUser> {
     @Override
     public boolean equals(Object obj);
 
-    public float[] getTmpArray();
-
-    public void setTmpArray(float[] tmpArray);
+//    public float[] getTmpArray();
+//
+//    public void setTmpArray(float[] tmpArray);
 
     public float[] getTopics();
 

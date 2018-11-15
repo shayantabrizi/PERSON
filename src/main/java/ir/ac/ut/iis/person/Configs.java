@@ -26,15 +26,16 @@ public class Configs {
     public static final boolean useDFCache = true;      // Just keep it unchanged
     public static boolean useSearchCaching = true;   // See the comments for ignoreSelfCitations
     public static final int randomSeed = 1;     // Random seed
+    public static final boolean multiThreaded = true;
 
     // ASPIRE parameters    
     public static final double ASPIRECoefficient = 2;    // topkRel=ASPIRECoefficient*topkEval in ASPIRE
     public static final String badDocumentsFileName = "badDocuments.txt";   // Just keep it unchanged       
 
     // Fundamental parameters
-    public static String datasetName = "aminer_>2002_again";     // The name of the dataset folder
+    public static String datasetName = "aminer";     // The name of the dataset folder
     public static String datasetRoot = getDatasetRoot();      // The root address of the dataset
-    public static String database_name = "aminer_>2002_again";     // The MySQL database name
+    public static String database_name = "aminerDB";     // The MySQL database name
     public static String databaseTablesPostfix = "";    // Just keep it unchanged
     public static String queryField = "title";          // The field of the query paper used as query. Keep it unchanged
     public static int mapBias = 0;                      // Just keep it unchanged
@@ -43,7 +44,7 @@ public class Configs {
     // to the paper "A Study of Smoothing Methods for Language Models Applied to Information Retrieval".
     // Don't use MyLM with Campos methods since it produces negative retrieval scores which can make a problem in IRR and SRR
     public static float lmDirichletMu = 100f;           // The Mu parameter of LM and MyLM methods
-    public static Evaluator evaluator = new PERSONEvaluator();      // Indicates whether to use PERSON or ASPIRE for evaluation
+    public static Evaluator evaluator = new PERSONEvaluator();//new MethodBasedEvaluator("queries-agg-100.txt");      // Indicates whether to use PERSON, ASPIRE, or MethodBasedEvaluator for evaluation
 //    public static Evaluator evaluator = null;
     public static int runNumber = 176;                  // Just a number so one can execute different runs without collision in the files or folders
     public static String indexName = "index_15_SymmetricAlpha";      // The name of the index folder
@@ -68,10 +69,11 @@ public class Configs {
     public static boolean loadGraph = false;                // Just keep it unchanged
     public static double pagerankAlpha = 0.15;              // the Alpha value in PageRank calculation
     public static String clustersFileName = null;     // Keep it unchanged
+    public static int pruneThreshold = 1000;
 
     // SocialTextual parameters
     public static int socialTextualDegree = 2;        // Keep it unchanged. Use friends and friends-of-friends in Social-Textual
-    public static double selfConsiderConstant = .09;   // If 0., do not consider the searcher himself in scoring. Otherwise, consider a User Relatedness (urf) of 1/selfConsiderConstant for the searcher. May be overriden in CiteseerxSocialTextualValueSource constructor.
+    public static double selfConsiderConstant = 0.;   // If 0., do not consider the searcher himself in scoring. Otherwise, consider a User Relatedness (urf) of 1/selfConsiderConstant for the searcher. May be overriden in CiteseerxSocialTextualValueSource constructor.
     public static boolean penalizeMultipleAuthorsInSocialTextual = true;      // Penalize the contribution of an author in a paper when there are more authors
     public static boolean considerFriendsOfFriendsInRandomNeighborFilteringSearcher = false;    // Just ignore it
     public static float ratioOfCandidateToResults = 2.f;        // Just ignore it
@@ -149,7 +151,8 @@ public class Configs {
         CREATE_INDEXES_WITH_TOPICS_STEP2,
         CREATE_INDEXES_WITH_TOPICS_STEP3,
         CREATE_QUERIES,
-        CREATE_SOCIAL_TEXTUAL_DATABASE
+        CREATE_SOCIAL_TEXTUAL_DATABASE,
+        CREATE_METHOD_BASED_JUDGMENTS;
     }
 
     private Configs() {

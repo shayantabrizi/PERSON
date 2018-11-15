@@ -37,7 +37,6 @@ import ir.ac.ut.iis.person.paper.TopicsReader;
 import ir.ac.ut.iis.person.query.NormalizedQueryExpander;
 import ir.ac.ut.iis.person.query.QueryConverter;
 import ir.ac.ut.iis.person.query.QueryExpander;
-import ir.ac.ut.iis.person.topics.InstanceClassifier;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
@@ -127,13 +126,12 @@ public class AddSearchers {
         retriever.addSearcher(new BasicSearcher(DatasetMain.getInstance().getIndexSearcher(), "02-WeiSimilarity-.80", new MyDummySimilarity(Configs.lmDirichletMu, new MyWeiQuery(Configs.lmDirichletMu, .8f, DatasetMain.getInstance().getIndexReader(), readTopicWords, alphas, readTopicWords.getBeta())), queryConverter));
 //        retriever.addSearcher(new BasicSearcher(DatasetMain.getInstance().getIndexSearcher(), "02-WeiSimilarity-.75", new MyDummySimilarity(Configs.lmDirichletMu, new MyWeiQuery(Configs.lmDirichletMu, .75f, DatasetMain.getInstance().getIndexReader(), readTopicWords, alphas, TopicsReader.readBeta())), queryConverter));
 
-        InstanceClassifier ic = new InstanceClassifier();
 //        addTopicSearcher(new JSSearcherAuthor(1.f), .1f, .8f, ic, readTopicWords, alphas, queryConverter);
 //        addTopicSearcher(new KLDocSearcher(1.f), .1f, .8f, ic, readTopicWords, alphas, queryConverter);
 //        addTopicSearcher(new KLDocQuery(1.f), .1f, .8f, ic, readTopicWords, alphas, queryConverter);
 //        addTopicSearcher(new KLSearcherDoc(1.f), .1f, .8f, ic, readTopicWords, alphas, queryConverter);
 //        addTopicSearcher(new KLQueryDoc(1.f), .1f, .8f, ic, readTopicWords, alphas, queryConverter);
-        float constantWeight = 0f;
+//        float constantWeight = 0f;
 //        addTopicSearcher(new CosineSearcherAuthor(1f - constantWeight), .25f, .8f, constantWeight, ic, readTopicWords, alphas, queryConverter);
 //        addTopicSearcher(new CosineSearcherDoc(1.f), .1f, .8f, ic, readTopicWords, alphas, queryConverter);
 //        addTopicSearcher(new MyCosineSearcherAuthor(1f - constantWeight, .1f), .25f, .8f, constantWeight, ic, readTopicWords, alphas, queryConverter);

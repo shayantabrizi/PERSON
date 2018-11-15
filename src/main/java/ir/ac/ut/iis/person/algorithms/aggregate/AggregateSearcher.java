@@ -46,7 +46,7 @@ public class AggregateSearcher extends BasicSearcher {
     }
 
     @Override
-    public Query createQuery(String convertedQuery, ir.ac.ut.iis.person.query.Query query, Integer year) throws QueryNodeException {
+    public Query createQuery(String convertedQuery, ir.ac.ut.iis.person.query.Query query, Integer year) {
         vs.initialize(query);
         Query createQuery = super.createQuery(convertedQuery, query, year);
         float maxWeight = 0f;

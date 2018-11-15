@@ -46,7 +46,7 @@ public class BasicSearcher extends Searcher {
     protected final IndexSearcher searcher;
     private final StandardQueryParser parser;
     private final Similarity similarity;
-    private FeedbackExpander fe;
+    private final FeedbackExpander fe;
     private Instance.Instances instances = null;
 
     public void startCollectingFeatures() {
@@ -156,7 +156,7 @@ public class BasicSearcher extends Searcher {
 ////                System.out.println(explain.toHtml());
 //            }
 
-        } catch (QueryNodeException | IOException ex) {
+        } catch (IOException ex) {
 //            String t = getQueryConverter().run(q.getQuery());
             Logger.getLogger(BasicSearcher.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -168,7 +168,7 @@ public class BasicSearcher extends Searcher {
         return res;
     }
 
-    public Query createQuery(String convertedQuery, ir.ac.ut.iis.person.query.Query query, Integer year) throws QueryNodeException {
+    public Query createQuery(String convertedQuery, ir.ac.ut.iis.person.query.Query query, Integer year) {
         Query parse;
         Query ignoreQuery = null;
         if (Configs.ignoreSelfCitations && query.getIgnoredResults() != null && !query.getIgnoredResults().isEmpty()) {
@@ -176,13 +176,23 @@ public class BasicSearcher extends Searcher {
             for (String s : query.getIgnoredResults()) {
                 sb.append(s).append(" ");
             }
-            ignoreQuery = parser.parse(sb.toString(), "id");
+            try {
+                ignoreQuery = parser.parse(sb.toString(), "id");
+            } catch (QueryNodeException ex) {
+                Logger.getLogger(BasicSearcher.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RuntimeException();
+            }
         }
 
         if (similarity instanceof MyDummySimilarity) {
             parse = ((MyDummySimilarity) similarity).initializeQuery("content", convertedQuery, query, ignoreQuery);
         } else {
-            parse = new StandardQueryParser(new StandardAnalyzer(CharArraySet.EMPTY_SET)).parse(convertedQuery, "content");     // Don't use MyAnalyzer. A word like "named" that is already stemmed to "name" may be removed because it's in the stopwords list.
+            try {
+                parse = new StandardQueryParser(new StandardAnalyzer(CharArraySet.EMPTY_SET)).parse(convertedQuery, "content");     // Don't use MyAnalyzer. A word like "named" that is already stemmed to "name" may be removed because it's in the stopwords list.
+            } catch (QueryNodeException ex) {
+                Logger.getLogger(BasicSearcher.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RuntimeException();
+            }
             if (Configs.yearFiltering || Configs.ignoreSelfCitations) {
                 Query newRangeQuery = IntPoint.newRangeQuery("year", 1_900, year);
                 BooleanQuery.Builder builder = new BooleanQuery.Builder()
@@ -206,7 +216,7 @@ public class BasicSearcher extends Searcher {
         searcher.setSimilarity(similarity);
         try {
             return searcher.explain(createQuery(convertedQuery.query, q, q.getYear()), docId).toString();
-        } catch (QueryNodeException | IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(BasicSearcher.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException();
         }

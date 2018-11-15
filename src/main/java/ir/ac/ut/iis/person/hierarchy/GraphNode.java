@@ -23,6 +23,7 @@ public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, IUser
     private final Object2ObjectOpenHashMap<MeasureCalculator, float[]> measure = new Object2ObjectOpenHashMap<>(1, .75f);
     private float[][] degree;
     private final HierarchyNode hierarchyNode;
+    private float[] tmpArray;
 
     public GraphNode(IUser id, HierarchyNode hierarchyNode) {
         super(id);
@@ -69,11 +70,13 @@ public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, IUser
     }
 
     public float[] getTmpArray() {
-        return getId().getTmpArray();
+        return this.tmpArray;
+//        return getId().getTmpArray();
     }
 
     public void setTmpArray(float[] tmpArray) {
-        getId().setTmpArray(tmpArray);
+        this.tmpArray = tmpArray;
+//        getId().setTmpArray(tmpArray);
     }
 
     public float[] getDegree(short level) {

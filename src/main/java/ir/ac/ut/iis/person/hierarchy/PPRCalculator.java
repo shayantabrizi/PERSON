@@ -6,6 +6,7 @@
 package ir.ac.ut.iis.person.hierarchy;
 
 import ir.ac.ut.iis.person.Configs;
+import ir.ac.ut.iis.person.base.Threads;
 
 /**
  *
@@ -43,12 +44,26 @@ public abstract class PPRCalculator implements MeasureCalculator {
         if (get != null) {
             return get;
         }
+        float[] measure;
+        Threads.enterSafeArea();
+        if (parentSize > 400_000) {
+            synchronized (PPRCalculator.class) {
+                measure = doCalculate(parent, numOfWeights, parentSize, level, node);
+            }
+        } else {
+            measure = doCalculate(parent, numOfWeights, parentSize, level, node);
+        }
+        Threads.enterUnsafeArea();
+        return measure;
+    }
+
+    private float[] doCalculate(Iterable<GraphNode> parent, int numOfWeights, int parentSize, short level, GraphNode node) throws RuntimeException {
         if (Configs.useCachedPPRs) {
             /*
             float[] pprFromDB = HierarchyNode.getUserPPRFromDB(HierarchyNode.id, numOfWeights, node);
             if (pprFromDB != null) {
-                node.addPPR(this, pprFromDB);
-                return pprFromDB;
+            node.addPPR(this, pprFromDB);
+            return pprFromDB;
             }
              */
         }
@@ -105,9 +120,6 @@ public abstract class PPRCalculator implements MeasureCalculator {
                         break;
                     }
                     GraphNode otherSide = e.getOtherSide(u);
-                    //                    if (otherSide.getId().equals("152068") && id == 1) {
-                    //                        System.out.println("");
-                    //                    }
                     for (int i = 0; i < numOfWeights; i++) {
                         otherSide.getTmpArray()[i] = (float) (otherSide.getTmpArray()[i] + e.getWeight()[i] / degree[i] * ppr[i] * (1 - alpha));
                     }
@@ -117,20 +129,20 @@ public abstract class PPRCalculator implements MeasureCalculator {
             for (int i = 0; i < numOfWeights; i++) {
                 diff[i] = 0;
             }
-//            double sum = 0;
+            double sum = 0;
             for (GraphNode u : parent) {
                 final float[] ppr = u.getMeasure(this);
                 for (int i = 0; i < numOfWeights; i++) {
                     float abs = Math.abs(u.getTmpArray()[i] - ppr[i]);
                     diff[i] = Math.max(diff[i], abs);
                     ppr[i] = u.getTmpArray()[i];
-//                    sum += u.getTmpArray()[i];
+                    sum += u.getTmpArray()[i];
                     u.getTmpArray()[i] = 0.f;
                 }
             }
-//            if (Math.abs(sum - 1) > 1e-4) {
-//                System.out.println("PPR sum: " + sum);
-//            }
+            if (Math.abs(sum - numOfWeights) > 1e-2) {
+                throw new RuntimeException(String.valueOf(sum));
+            }
         }
         for (GraphNode u : parent) {
             u.setTmpArray(null);
