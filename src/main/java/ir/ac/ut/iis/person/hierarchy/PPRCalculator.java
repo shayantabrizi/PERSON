@@ -45,8 +45,8 @@ public abstract class PPRCalculator implements MeasureCalculator {
             return get;
         }
         float[] measure;
-        Hierarchy hier = node.getHierarchyNode().getHierarchy();
         Threads.enterSafeArea();
+        Hierarchy hier = node.getHierarchyNode().getHierarchy();
         synchronized (hier) {
             if (parentSize > 400_000) {
                 synchronized (PPRCalculator.class) {
@@ -154,5 +154,4 @@ public abstract class PPRCalculator implements MeasureCalculator {
         System.out.println("PPR: " + this);
         return node.getMeasure(this);
     }
-
 }

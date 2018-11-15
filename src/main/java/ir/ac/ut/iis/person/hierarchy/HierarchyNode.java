@@ -257,47 +257,47 @@ public class HierarchyNode {
     }
 
     public float[] selfPPR(PPRCalculator pprCalculator, double pageRankAlpha) {
-            if (pprCalculator == null) {
-                return selfPPR(pageRankAlpha);
-            }
-            float[] get = selfPPR.get(pprCalculator);
-            if (get != null) {
+        if (pprCalculator == null) {
+            return selfPPR(pageRankAlpha);
+        }
+        float[] get = selfPPR.get(pprCalculator);
+        if (get != null) {
 //            System.out.println("Self: " + get[0]);
-                return get;
-            }
+            return get;
+        }
 
-            int numOfWeights = hier.getNumberOfWeights();
-            if (parent == null) {
-                float[] temp = new float[numOfWeights];
-                selfPPR.put(pprCalculator, temp);
-                for (int i = 0; i < numOfWeights; i++) {
-                    temp[i] = 1.f;
-                }
+        int numOfWeights = hier.getNumberOfWeights();
+        if (parent == null) {
+            float[] temp = new float[numOfWeights];
+            selfPPR.put(pprCalculator, temp);
+            for (int i = 0; i < numOfWeights; i++) {
+                temp[i] = 1.f;
+            }
 //            System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
-                return temp;
-            }
+            return temp;
+        }
 
-            if (Configs.useCachedPPRs) {
-                /*
+        if (Configs.useCachedPPRs) {
+            /*
             selfPPR = getSelfPPRFromDB(getId(), numOfWeights);
             if (selfPPR != null) {
 //                System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
                 return selfPPR;
             }
-                 */
-            }
-            float[] temp = new float[numOfWeights];
-            selfPPR.put(pprCalculator, temp);
+             */
+        }
+        float[] temp = new float[numOfWeights];
+        selfPPR.put(pprCalculator, temp);
 
-            for (GraphNode u : getUsers()) {
-                float[] userPPR = userPPR(pprCalculator, pageRankAlpha, u);
-                for (int i = 0; i < numOfWeights; i++) {
-                    temp[i] += userPPR[i];
-                }
+        for (GraphNode u : getUsers()) {
+            float[] userPPR = userPPR(pprCalculator, pageRankAlpha, u);
+            for (int i = 0; i < numOfWeights; i++) {
+                temp[i] += userPPR[i];
             }
+        }
 
 //        System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
-            return temp;
+        return temp;
     }
 
     public static float[] getSelfPPRFromDB(short hierarchyNodeId, int numOfWeights, float pageRankAlpha) throws RuntimeException {
@@ -328,21 +328,21 @@ public class HierarchyNode {
     }
 
     public float[] userPPR(GraphNode node, double pageRankAlpha) {
-            return userPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha, node);
+        return userPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha, node);
     }
 
     public float[] userPPR(PPRCalculator pprCalculator, double pageRankAlpha, GraphNode node) {
-            if (pprCalculator == null) {
-                return userPPR(node, pageRankAlpha);
-            }
-            if (parent == null) {
-                System.out.println("null parent occured");
+        if (pprCalculator == null) {
+            return userPPR(node, pageRankAlpha);
+        }
+        if (parent == null) {
+            System.out.println("null parent occured");
 //            System.out.println("");
-                throw new IgnoreQueryEx();
-            }
-            final float[] PPR = pprCalculator.calc(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level);
+            throw new IgnoreQueryEx();
+        }
+        final float[] PPR = pprCalculator.calc(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level);
 //        System.out.println(PPR[0]);
-            return PPR;
+        return PPR;
     }
 
     public float[] userUserPPR(GraphNode node, GraphNode topic) {
