@@ -253,13 +253,10 @@ public class HierarchyNode {
     }
 
     public float[] selfPPR(double pageRankAlpha) {
-        synchronized (hier) {
-            return selfPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha);
-        }
+        return selfPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha);
     }
 
     public float[] selfPPR(PPRCalculator pprCalculator, double pageRankAlpha) {
-        synchronized (hier) {
             if (pprCalculator == null) {
                 return selfPPR(pageRankAlpha);
             }
@@ -301,7 +298,6 @@ public class HierarchyNode {
 
 //        System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
             return temp;
-        }
     }
 
     public static float[] getSelfPPRFromDB(short hierarchyNodeId, int numOfWeights, float pageRankAlpha) throws RuntimeException {
@@ -332,13 +328,10 @@ public class HierarchyNode {
     }
 
     public float[] userPPR(GraphNode node, double pageRankAlpha) {
-        synchronized (hier) {
             return userPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha, node);
-        }
     }
 
     public float[] userPPR(PPRCalculator pprCalculator, double pageRankAlpha, GraphNode node) {
-        synchronized (hier) {
             if (pprCalculator == null) {
                 return userPPR(node, pageRankAlpha);
             }
@@ -350,7 +343,6 @@ public class HierarchyNode {
             final float[] PPR = pprCalculator.calc(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level);
 //        System.out.println(PPR[0]);
             return PPR;
-        }
     }
 
     public float[] userUserPPR(GraphNode node, GraphNode topic) {
@@ -445,5 +437,9 @@ public class HierarchyNode {
             return false;
         }
         return true;
+    }
+
+    public Hierarchy getHierarchy() {
+        return hier;
     }
 }

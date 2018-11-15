@@ -45,15 +45,19 @@ public abstract class PPRCalculator implements MeasureCalculator {
             return get;
         }
         float[] measure;
+        Hierarchy hier = node.getHierarchyNode().getHierarchy();
         Threads.enterSafeArea();
-        if (parentSize > 400_000) {
-            synchronized (PPRCalculator.class) {
+        synchronized (hier) {
+            if (parentSize > 400_000) {
+                synchronized (PPRCalculator.class) {
+                    measure = doCalculate(parent, numOfWeights, parentSize, level, node);
+                }
+            } else {
                 measure = doCalculate(parent, numOfWeights, parentSize, level, node);
             }
-        } else {
-            measure = doCalculate(parent, numOfWeights, parentSize, level, node);
         }
         Threads.enterUnsafeArea();
+
         return measure;
     }
 
