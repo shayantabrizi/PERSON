@@ -7,6 +7,7 @@ package ir.ac.ut.iis.person.hierarchy;
 
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.base.Threads;
+import java.util.Arrays;
 
 /**
  *
@@ -40,14 +41,14 @@ public abstract class PPRCalculator implements MeasureCalculator {
 
     @Override
     public float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level) {
-        float[] get = node.getMeasure(this);
-        if (get != null) {
-            return get;
-        }
         float[] measure;
-        Threads.enterSafeArea();
         Hierarchy hier = node.getHierarchyNode().getHierarchy();
         synchronized (hier) {
+            float[] get = node.getMeasure(this);
+            if (get != null) {
+                return get;
+            }
+            Threads.enterSafeArea();
             if (parentSize > 400_000) {
                 synchronized (PPRCalculator.class) {
                     measure = doCalculate(parent, numOfWeights, parentSize, level, node);
@@ -57,7 +58,6 @@ public abstract class PPRCalculator implements MeasureCalculator {
             }
         }
         Threads.enterUnsafeArea();
-
         return measure;
     }
 
@@ -78,13 +78,14 @@ public abstract class PPRCalculator implements MeasureCalculator {
         //            defaultVal =
         //        }
         for (GraphNode u : parent) {
-            float[] arr = new float[numOfWeights];
-            float[] tmp = new float[numOfWeights];
+//            float[] arr = new float[numOfWeights * 2];
+            float[] tmp = new float[numOfWeights * 2];
             for (int i = 0; i < numOfWeights; i++) {
-                arr[i] = 1.f / parentSize;
+//                arr[i] = 1.f / parentSize;
                 tmp[i] = 0;
+                tmp[numOfWeights + i] = 1.f / parentSize;
             }
-            u.addMeasure(this, arr);
+//            u.addMeasure(this, arr);
             u.setTmpArray(tmp);
         }
         //        for (User u : topic) {
@@ -113,10 +114,10 @@ public abstract class PPRCalculator implements MeasureCalculator {
             float[] zeroDegrees = new float[numOfWeights];
             for (GraphNode u : parent) {
                 float[] degree = u.getDegree(level);
-                float[] ppr = u.getMeasure(this);
+                float[] tmpArray = u.getTmpArray();
                 for (int i = 0; i < numOfWeights; i++) {
                     if (degree[i] == 0.) {
-                        zeroDegrees[i] += ppr[i];
+                        zeroDegrees[i] += tmpArray[numOfWeights + i];
                     }
                 }
                 for (GraphNode.HierarchicalEdge e : u.getEdges()) {
@@ -125,7 +126,7 @@ public abstract class PPRCalculator implements MeasureCalculator {
                     }
                     GraphNode otherSide = e.getOtherSide(u);
                     for (int i = 0; i < numOfWeights; i++) {
-                        otherSide.getTmpArray()[i] = (float) (otherSide.getTmpArray()[i] + e.getWeight()[i] / degree[i] * ppr[i] * (1 - alpha));
+                        otherSide.getTmpArray()[i] = (float) (otherSide.getTmpArray()[i] + e.getWeight()[i] / degree[i] * tmpArray[numOfWeights + i] * (1 - alpha));
                     }
                 }
             }
@@ -135,13 +136,13 @@ public abstract class PPRCalculator implements MeasureCalculator {
             }
             double sum = 0;
             for (GraphNode u : parent) {
-                final float[] ppr = u.getMeasure(this);
+                final float[] tmpArray = u.getTmpArray();
                 for (int i = 0; i < numOfWeights; i++) {
-                    float abs = Math.abs(u.getTmpArray()[i] - ppr[i]);
+                    float abs = Math.abs(tmpArray[i] - tmpArray[numOfWeights + i]);
                     diff[i] = Math.max(diff[i], abs);
-                    ppr[i] = u.getTmpArray()[i];
-                    sum += u.getTmpArray()[i];
-                    u.getTmpArray()[i] = 0.f;
+                    tmpArray[numOfWeights + i] = tmpArray[i];
+                    sum += tmpArray[i];
+                    tmpArray[i] = 0.f;
                 }
             }
             if (Math.abs(sum - numOfWeights) > 1e-2) {
@@ -149,7 +150,10 @@ public abstract class PPRCalculator implements MeasureCalculator {
             }
         }
         for (GraphNode u : parent) {
+            float[] tmpArray = u.getTmpArray();
+            float[] ppr = Arrays.copyOfRange(tmpArray, numOfWeights, 2 * numOfWeights);
             u.setTmpArray(null);
+            u.addMeasure(this, ppr);
         }
         System.out.println("PPR: " + this);
         return node.getMeasure(this);
