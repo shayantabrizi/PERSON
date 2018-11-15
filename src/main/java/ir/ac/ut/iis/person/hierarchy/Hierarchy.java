@@ -12,10 +12,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
@@ -37,10 +40,18 @@ public class Hierarchy<U extends User> {
     private final Int2ObjectOpenHashMap<GraphNode> userNodeMapping = new Int2ObjectOpenHashMap<>();
     private final String name;
     private int numberOfWeights;
+    private static final Collection<Hierarchy<?>> precomputationHierarchies = new ArrayList<>();
     private Thread thread;
 
-    public Hierarchy(String name) {
+    public Hierarchy(String name, boolean forPrecomputation) {
         this.name = name;
+        if (forPrecomputation) {
+            precomputationHierarchies.add(this);
+        }
+    }
+
+    public Hierarchy(String name) {
+        this(name, true);
     }
 
     public int getNumberOfWeights() {
@@ -322,14 +333,57 @@ public class Hierarchy<U extends User> {
         return user;
     }
 
-    public void eagerPPR(int sizeThreshold, double pageRankAlpha) {     // Do not use. Because tmpArray in User is shared among different PPR computations, multithreaded computation is currently not possible.
+    public static void precompute(int childThreshold, int parentThreshold, double pageRankAlpha, Set<GraphNode> searchNodes) {
+        for (Hierarchy<?> h : precomputationHierarchies) {
+            h.eagerPPR(childThreshold, parentThreshold, pageRankAlpha);
+        }
+        for (Hierarchy<?> h : precomputationHierarchies) {
+            h.join();
+        }
+        if (searchNodes != null) {
+            for (Hierarchy h : precomputationHierarchies) {
+                computeSearcherPPRs(searchNodes, h, pageRankAlpha);
+            }
+            for (Hierarchy h : precomputationHierarchies) {
+                h.join();
+            }
+        }
+    }
+
+    private static void computeSearcherPPRs(Set<GraphNode> testSearchers, Hierarchy h, double pageRankAlpha) {
+        final Thread thread = new Thread(() -> {
+            for (GraphNode t : testSearchers) {
+                final HierarchyNode hierarchyNode = t.getHierarchyNode();
+                if (hierarchyNode.getParent().usersNum() >= 5000) {
+                    if (hierarchyNode.getParent() != null && hierarchyNode.getParent().usersNum() > 400_000) {
+                        synchronized (Hierarchy.class) {
+                            hierarchyNode.selfPPR(pageRankAlpha);
+                        }
+                    } else {
+                        hierarchyNode.selfPPR(pageRankAlpha);
+                    }
+                }
+            }
+        });
+        h.thread = thread;
+        thread.start();
+    }
+
+    private void eagerPPR(int childThreshold, int parentThreshold, double pageRankAlpha) {     // Do not use. Because tmpArray in User is shared among different PPR computations, multithreaded computation is currently not possible.
         thread = new Thread(() -> {
-            rootNode.eagerPPR(sizeThreshold, pageRankAlpha);
+            rootNode.eagerPPR(childThreshold, parentThreshold, pageRankAlpha);
         });
         thread.start();
     }
 
-    public void join() {
+    public static void pruneSearcherHierNodes(int ratio, int searcher) {
+        for (Hierarchy<?> h : precomputationHierarchies) {
+            GraphNode userNode = h.getUserNode(searcher);
+            userNode.getHierarchyNode().doPrune(ratio);
+        }
+    }
+
+    private void join() {
         try {
             thread.join();
         } catch (InterruptedException ex) {
