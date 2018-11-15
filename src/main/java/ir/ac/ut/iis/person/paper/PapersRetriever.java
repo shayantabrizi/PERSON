@@ -70,13 +70,13 @@ public class PapersRetriever extends Retriever {
 
     private static final Instances instances = new Instances();
 
-    public PapersRetriever(String name, Evaluator evaluator, IndexSearcher indexSearcher, String quriesFile) {
+    public PapersRetriever(String name, Evaluator evaluator, IndexSearcher indexSearcher, String queriesFile) {
         super(name, evaluator);
         this.rootSearcher = indexSearcher;
         this.rootReader = indexSearcher.getIndexReader();
         if (Configs.runStage.equals(Configs.RunStage.NORMAL) || Configs.runStage.equals(Configs.RunStage.CREATE_METHOD_BASED_JUDGMENTS)) {
             try {
-                this.scanner = new Scanner(new FileInputStream(quriesFile));
+                this.scanner = new Scanner(new FileInputStream(queriesFile));
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(PapersRetriever.class.getName()).log(Level.SEVERE, null, ex);
                 throw new RuntimeException();
@@ -173,7 +173,7 @@ public class PapersRetriever extends Retriever {
         yourFile.getParentFile().mkdirs();
         Set<Integer> set = new HashSet<>();
         try (Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(queryFile)))) {
-            for (int i = 0; i < 400_000; i++) {
+            for (int i = 0; i < 1_000_000; i++) {
                 int docId = Main.random(rootReader.maxDoc());
                 if (set.contains(docId)) {
                     continue;
@@ -226,7 +226,7 @@ public class PapersRetriever extends Retriever {
         yourFile.getParentFile().mkdirs();
         Set<Integer> set = new HashSet<>();
         try (Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(queryFile)))) {
-            for (int i = 0; i < 400_000; i++) {
+            for (int i = 0; i < 1_000_000; i++) {
                 int docId = Main.random(rootReader.maxDoc());
                 if (set.contains(docId)) {
                     continue;
@@ -263,13 +263,13 @@ public class PapersRetriever extends Retriever {
                     continue;
                 }
                 float[] topics = TopicsValueSource.getTopics(document);
-                final Integer topTopic = InstanceClassifier.getTopClasses(topics, 1).get(0);
-                final Integer topAuthorTopic = InstanceClassifier.getTopClasses(authorTopics, 1).get(0);
+                final float topTopic = topics[InstanceClassifier.getTopClasses(topics, 1).get(0)];
+                final float topAuthorTopic = authorTopics[InstanceClassifier.getTopClasses(authorTopics, 1).get(0)];
 //                final List<Integer> topAuthorTopics = InstanceClassifier.getTopClasses(authorTopics, 1);
                 boolean check = false;
                 for (int j = 0; j < topics.length; j++) {
-                    if (topics[j] > .25 || j == topTopic) {
-                        if (authorTopics[j] > .25 || j == topAuthorTopic) {
+                    if (topics[j] > .25 || topics[j] == topTopic) {
+                        if (authorTopics[j] > .25 || authorTopics[j] == topAuthorTopic) {
                             check = true;
                         }
                     }
@@ -299,6 +299,24 @@ public class PapersRetriever extends Retriever {
 //
 //        return get.split(" ")[0];
 //    }
+    
+    public Set<Query> getTestQueries() {
+        Set<Query> ss = new HashSet<>();
+        try (Scanner sc = new Scanner(new FileInputStream(Configs.datasetRoot + "/queries/" + Configs.queryFile))) {
+            doSkipQueryBatch(sc, Configs.skipQueries);
+            for (int i = 0; i < Configs.queryCount; i++) {
+                QueryBatch nextQueryBatch = getNextQueryBatch(sc);
+                for (Query q : nextQueryBatch) {
+                    ss.add(q);
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(PapersRetriever.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException();
+        }
+        return ss;
+    }
+
     @Override
     public boolean hasNextQueryBatch() {
         return scanner.hasNextLine();
@@ -306,12 +324,15 @@ public class PapersRetriever extends Retriever {
 
     @Override
     public QueryBatch nextQueryBatch() {
-        String[] nextLine = scanner.nextLine().split(" ");
+        return getNextQueryBatch(scanner);
+    }
+
+    private QueryBatch getNextQueryBatch(Scanner sc) throws RuntimeException {
+        String[] nextLine = sc.nextLine().split(" ");
         String queryDocId = nextLine[0];
         String searcher = nextLine[1];
         rootSearcher.setSimilarity(new ClassicSimilarity());
-
-//        return "graph";
+        //        return "graph";
         try {
             TopDocs results = rootSearcher.search(new TermQuery(new Term("id", queryDocId)), 1);
             final Document document = rootReader.document(results.scoreDocs[0].doc);
@@ -810,8 +831,12 @@ public class PapersRetriever extends Retriever {
 
     @Override
     public void skipQueryBatch(int n) {
+        doSkipQueryBatch(scanner, n);
+    }
+
+    private void doSkipQueryBatch(Scanner sc, int n) {
         for (int i = 0; i < n; i++) {
-            scanner.nextLine();
+            sc.nextLine();
         }
     }
 }
