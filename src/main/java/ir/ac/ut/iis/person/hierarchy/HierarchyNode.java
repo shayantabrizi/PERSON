@@ -9,6 +9,7 @@ import com.google.common.collect.Iterables;
 import ir.ac.ut.iis.person.Configs;
 import ir.ac.ut.iis.person.algorithms.social_textual.MySQLConnector;
 import ir.ac.ut.iis.person.base.IgnoreQueryEx;
+import ir.ac.ut.iis.person.base.Threads;
 import ir.ac.ut.iis.person.myretrieval.CachedIndexSearcher;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -56,6 +57,7 @@ public class HierarchyNode {
     private static PreparedStatement selectSelfStatement = null;
     private static final Map<Integer, PreparedStatement> selectUserStatements = new HashMap<>();
     private final Hierarchy hier;
+    private volatile boolean isBeingProcessed = false;
 
     private short flag;
 
@@ -255,49 +257,79 @@ public class HierarchyNode {
     public float[] selfPPR(double pageRankAlpha) {
         return selfPPR(new UniformPPR(id, getUsers(), usersNum(), pageRankAlpha), pageRankAlpha);
     }
+//    public static int c1 = 0;
+//    public static int c2 = 0;
+//    public static int c3 = 0;
+//    public static int c4 = 0;
+//    public static int c5 = 0;
+//    public static int c6 = 0;
 
     public float[] selfPPR(PPRCalculator pprCalculator, double pageRankAlpha) {
         if (pprCalculator == null) {
             return selfPPR(pageRankAlpha);
         }
-        float[] get = selfPPR.get(pprCalculator);
-        if (get != null) {
-//            System.out.println("Self: " + get[0]);
-            return get;
-        }
-
-        int numOfWeights = hier.getNumberOfWeights();
-        if (parent == null) {
-            float[] temp = new float[numOfWeights];
-            selfPPR.put(pprCalculator, temp);
-            for (int i = 0; i < numOfWeights; i++) {
-                temp[i] = 1.f;
+        float[] res = null;
+        if (isBeingProcessed == false) {
+            float[] get = selfPPR.get(pprCalculator);
+            if (get != null) {
+//                c1++;
+                res = get;
             }
-//            System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
-            return temp;
         }
 
-        if (Configs.useCachedPPRs) {
-            /*
+        if (res == null) {
+            boolean check = false;
+            Threads.enterSafeArea();
+            synchronized (hier) {
+                float[] get = selfPPR.get(pprCalculator);
+                if (get != null) {
+//                    c2++;
+                    res = get;
+                } else {
+                    check = true;
+                    isBeingProcessed = true;
+                    int numOfWeights = hier.getNumberOfWeights();
+                    if (parent == null) {
+                        res = new float[numOfWeights];
+                        selfPPR.put(pprCalculator, res);
+                        for (int i = 0; i < numOfWeights; i++) {
+                            res[i] = 1.f;
+                        }
+//            System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
+                    }
+
+                    if (res == null) {
+                        if (Configs.useCachedPPRs) {
+                            /*
             selfPPR = getSelfPPRFromDB(getId(), numOfWeights);
             if (selfPPR != null) {
 //                System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
                 return selfPPR;
             }
-             */
-        }
-        float[] temp = new float[numOfWeights];
-        selfPPR.put(pprCalculator, temp);
+                             */
+                        }
+                        res = new float[numOfWeights];
+                        selfPPR.put(pprCalculator, res);
 
-        for (GraphNode u : getUsers()) {
-            float[] userPPR = userPPR(pprCalculator, pageRankAlpha, u);
-            for (int i = 0; i < numOfWeights; i++) {
-                temp[i] += userPPR[i];
+                        for (GraphNode u : getUsers()) {
+                            float[] userPPR = userPPR(pprCalculator, pageRankAlpha, u, false);
+                            for (int i = 0; i < numOfWeights; i++) {
+                                res[i] += userPPR[i];
+                            }
+                        }
+//                        c3++;
+                    }
+                }
             }
+            if (check) {
+                synchronized (hier) {
+                    isBeingProcessed = false;
+                }
+            }
+            Threads.enterUnsafeArea();
         }
-
 //        System.out.println("SelfPPR: " + getId() + ": " + selfPPR[0]);
-        return temp;
+        return res;
     }
 
     public static float[] getSelfPPRFromDB(short hierarchyNodeId, int numOfWeights, float pageRankAlpha) throws RuntimeException {
@@ -332,6 +364,10 @@ public class HierarchyNode {
     }
 
     public float[] userPPR(PPRCalculator pprCalculator, double pageRankAlpha, GraphNode node) {
+        return userPPR(pprCalculator, pageRankAlpha, node, true);
+    }
+
+    public float[] userPPR(PPRCalculator pprCalculator, double pageRankAlpha, GraphNode node, boolean safetyChecking) {
         if (pprCalculator == null) {
             return userPPR(node, pageRankAlpha);
         }
@@ -340,7 +376,40 @@ public class HierarchyNode {
 //            System.out.println("");
             throw new IgnoreQueryEx();
         }
-        final float[] PPR = pprCalculator.calc(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level);
+        float[] PPR = null;
+        if (safetyChecking) {
+            if (isBeingProcessed == false) {
+                float[] get = node.getMeasure(pprCalculator);
+                if (get != null) {
+//                    c4++;
+                    PPR = get;
+                }
+            }
+            if (PPR == null) {
+                boolean check = false;
+                Threads.enterSafeArea();
+                synchronized (hier) {
+                    float[] get = node.getMeasure(pprCalculator);
+                    if (get != null) {
+//                        c5++;
+                        PPR = get;
+                    } else {
+                        check = true;
+                        isBeingProcessed = true;
+                        PPR = pprCalculator.calc(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level);
+//                        c6++;
+                    }
+                }
+                if (check) {
+                    synchronized (hier) {
+                        isBeingProcessed = false;
+                    }
+                }
+                Threads.enterUnsafeArea();
+            }
+        } else {
+            PPR = pprCalculator.calc(hier.getNumberOfWeights(), node, parent.getUsers(), parent.usersNum(), parent.level);
+        }
 //        System.out.println(PPR[0]);
         return PPR;
     }
@@ -437,9 +506,5 @@ public class HierarchyNode {
             return false;
         }
         return true;
-    }
-
-    public Hierarchy getHierarchy() {
-        return hier;
     }
 }

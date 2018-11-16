@@ -89,13 +89,14 @@ public abstract class Retriever implements Closeable {
             }
 
             writeLogs(queries);
+//            System.out.println("CC1: "+ HierarchyNode.c1 + " " + HierarchyNode.c2 + " " + HierarchyNode.c3);
+//            System.out.println("CC2: "+ HierarchyNode.c4 + " " + HierarchyNode.c5 + " " + HierarchyNode.c6);
             if (queries.properQueryCount() > 0) {
                 result = queries;
                 return true;
             } else {
                 return false;
             }
-
         } catch (IgnoreQueryEx ex) {
 //            ex.printStackTrace();
             System.out.println("query ignored: " + ex.getMessage());

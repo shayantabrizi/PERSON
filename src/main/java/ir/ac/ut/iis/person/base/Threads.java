@@ -36,6 +36,9 @@ public class Threads {
                     throw new ThreadStoppedException();
                 }
                 MyThread myThread = (MyThread) Thread.currentThread();
+                if (myThread.state.equals(Threads.State.UNSAFE_RUN)) {
+                    return;
+                }
                 if (myThread.state.equals(Threads.State.SAFE_RUN)) {
                     myThread.state = Threads.State.WAITING;
                 }
@@ -119,8 +122,6 @@ public class Threads {
                             return;
                         }
                     }
-                } else if (!myThread.state.equals(Threads.State.SAFE_RUN)) {
-                    throw new RuntimeException();
                 }
             }
         }

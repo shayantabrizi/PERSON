@@ -123,6 +123,7 @@ public class InstanceClassifier {
         Instance ins = new Instance(query, null, "test", null);
         InstanceList instanceList = new InstanceList(serialPipes);
         instanceList.addThruPipe(ins);
+        inferencer.setRandomSeed(Configs.randomSeed);
         final double[] sampledDistribution = inferencer.getSampledDistribution(instanceList.get(0), 100, 10, 10);
         float[] floatArray = new float[sampledDistribution.length];
         for (int i = 0; i < sampledDistribution.length; i++) {

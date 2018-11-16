@@ -26,7 +26,7 @@ public class Configs {
     public static final boolean useDFCache = true;      // Just keep it unchanged
     public static boolean useSearchCaching = true;   // See the comments for ignoreSelfCitations
     public static final int randomSeed = 1;     // Random seed
-    public static final boolean multiThreaded = true;
+    public static boolean multiThreaded = true;
 
     // ASPIRE parameters    
     public static final double ASPIRECoefficient = 2;    // topkRel=ASPIRECoefficient*topkEval in ASPIRE

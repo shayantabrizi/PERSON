@@ -6,7 +6,6 @@
 package ir.ac.ut.iis.person.hierarchy;
 
 import ir.ac.ut.iis.person.Configs;
-import ir.ac.ut.iis.person.base.Threads;
 import java.util.Arrays;
 
 /**
@@ -41,23 +40,19 @@ public abstract class PPRCalculator implements MeasureCalculator {
 
     @Override
     public float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level) {
+        float[] get = node.getMeasure(this);
+        if (get != null) {
+            return get;
+        }
+
         float[] measure;
-        Hierarchy hier = node.getHierarchyNode().getHierarchy();
-        synchronized (hier) {
-            float[] get = node.getMeasure(this);
-            if (get != null) {
-                return get;
-            }
-            Threads.enterSafeArea();
-            if (parentSize > 400_000) {
-                synchronized (PPRCalculator.class) {
-                    measure = doCalculate(parent, numOfWeights, parentSize, level, node);
-                }
-            } else {
+        if (parentSize > 400_000) {
+            synchronized (PPRCalculator.class) {
                 measure = doCalculate(parent, numOfWeights, parentSize, level, node);
             }
+        } else {
+            measure = doCalculate(parent, numOfWeights, parentSize, level, node);
         }
-        Threads.enterUnsafeArea();
         return measure;
     }
 
