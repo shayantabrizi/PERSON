@@ -6,7 +6,7 @@ Based on article [Shayan A. Tabrizi, Azadeh Shakery, Hamed Zamani, and Mohammad 
 			"PERSON: Personalized Information Retrieval Evaluation Based on Citation Networks," 
 			Information Processing & Management (IP&M), 2018] 
 			(https://www.sciencedirect.com/science/article/abs/pii/S0306457317307811)
-Version: 1.1
+Version: 2.0-performance-test
 
 -----------------------------------------------------------------------------
 
@@ -22,9 +22,6 @@ We really appreciate bug reports and any suggestions for improving the algorithm
 Some codes related to the Social-Textual algorithm are based on the codes provided by Ali Khodaei to us.
 
 The codes are dependent on retrieval-tools (https://github.com/shayantabrizi/retrieval-tools).
-
-Usage:
-	See tutorial.pdf for the instructions on how to use the codes.
 
 Change Log:
 Release 1.1:
