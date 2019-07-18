@@ -42,7 +42,8 @@ public class PapersMain extends DatasetMain {
         if (Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES_WITH_TOPICS_STEP1)
                 || Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES_WITH_TOPICS_STEP2)
                 || Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES_WITH_TOPICS_STEP3)
-                || Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES)) {
+                || Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES)
+                || Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES_WITH_PPRs)) {
             createIndexes(null, Configs.datasetRoot + "clusters/general.tree", Configs.datasetRoot + "index", Configs.datasetRoot + "index/general", true);
             return;
         }
@@ -92,7 +93,7 @@ public class PapersMain extends DatasetMain {
 //        ((PapersRetriever) Main.retriever).calcDatasetStats(Configs.datasetRoot + "datasetStats.txt");
 //        ((PapersRetriever) Main.retriever).createSimpleQueries(Configs.datasetRoot + "queries/general-queries.txt");
         if (Configs.runStage.equals(Configs.RunStage.CREATE_QUERIES)) {
-            ((PapersRetriever) Main.retriever).createSimpleQueries(Configs.datasetRoot + "queries/general.txt", null);
+            ((PapersRetriever) Main.retriever).createSimpleQueries(Configs.datasetRoot + "queries/test.txt", null);
 //            ((PapersRetriever) Main.retriever).createMultidisciplinaryQueries(Configs.datasetRoot + "queries/multidisciplinary.txt");
         }
 //        ((PapersRetriever) Main.retriever).createMultidisciplinaryQueries(Configs.datasetRoot + "queries/multidisciplinary-queries.txt");

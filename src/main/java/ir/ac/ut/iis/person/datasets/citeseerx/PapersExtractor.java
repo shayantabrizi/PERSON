@@ -10,6 +10,7 @@ import ir.ac.ut.iis.person.algorithms.aggregate.AggregateSearcher;
 import ir.ac.ut.iis.person.algorithms.social_textual.MySQLConnector;
 import ir.ac.ut.iis.person.hierarchy.Hierarchy;
 import ir.ac.ut.iis.person.hierarchy.HierarchyNode;
+import ir.ac.ut.iis.person.hierarchy.PPRLoader;
 import ir.ac.ut.iis.person.paper.Paper;
 import ir.ac.ut.iis.person.paper.TopicsReader;
 import ir.ac.ut.iis.retrieval_tools.citeseerx.PapersReader;
@@ -28,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -258,9 +260,9 @@ public class PapersExtractor {
             doc.add(new StringField("id", String.valueOf(node.getId()), Field.Store.YES));
             doc.add(new StringField("isMerged", String.valueOf(node.isIsMerged() ? 1 : 0), Field.Store.YES));
             doc.add(new TextField("title", node.getTitle(), Field.Store.YES));
-            doc.add(new TextField("abstract", node.getPaperAbstract(), Field.Store.YES));
+//            doc.add(new TextField("abstract", node.getPaperAbstract(), Field.Store.YES));
             FieldType type = new FieldType();
-            type.setStored(true);
+            type.setStored(false);
             type.setStoreTermVectors(true);
             type.setTokenized(true);
             type.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
@@ -279,6 +281,34 @@ public class PapersExtractor {
             }
             doc.add(new TextField("refs", refs.toString(), Field.Store.YES));
             doc.add(new TextField("authors", authors.toString(), Field.Store.YES));
+
+            if (Configs.runStage.equals(Configs.RunStage.CREATE_INDEXES_WITH_PPRs)) {
+                Map<Integer, Map<Integer, Float>> map = new HashMap<>();
+                for (Author c : node.getCreators()) {
+                    final HashMap<Integer, Float> get = new HashMap<>();
+                    map.put(c.getId(), get);
+                    List<Float> get1 = PPRLoader.map.get(c.getId());
+                    if (get1 != null) {
+                        for (Iterator<Float> it = get1.iterator(); it.hasNext();) {
+                            int id = (int) it.next().floatValue();
+                            Float ppr = it.next();
+                            get.put(id, ppr);
+                        }
+                    }
+                }
+                if (!map.isEmpty()) {
+                    byte[] pprs;
+                    try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                        ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream);
+                        out.writeObject(map);
+                        pprs = byteArrayOutputStream.toByteArray();
+                    } catch (IOException ex) {
+                        Logger.getLogger(PapersExtractor.class.getName()).log(Level.SEVERE, null, ex);
+                        throw new RuntimeException();
+                    }
+                    doc.add(new StoredField("pprs", pprs));
+                }
+            }
 
             if (topics != null) {
                 byte[] topicsArray;

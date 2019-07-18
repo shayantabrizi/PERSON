@@ -39,32 +39,23 @@ public abstract class PPRCalculator implements MeasureCalculator {
     public abstract boolean equals(Object obj);
 
     @Override
-    public float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level) {
-        float[] get = node.getMeasure(this);
-        if (get != null) {
+    public float calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level) {
+        float get = node.getMeasure(this);
+        if (get != -1) {
             return get;
         }
 
-        float[] measure;
-        if (parentSize > 400_000) {
-            synchronized (PPRCalculator.class) {
-                measure = doCalculate(parent, numOfWeights, parentSize, level, node);
-            }
-        } else {
-            measure = doCalculate(parent, numOfWeights, parentSize, level, node);
-        }
+        float measure;
+        measure = doCalculate(parent, numOfWeights, parentSize, level, node);
         return measure;
     }
 
-    private float[] doCalculate(Iterable<GraphNode> parent, int numOfWeights, int parentSize, short level, GraphNode node) throws RuntimeException {
+    private float doCalculate(Iterable<GraphNode> parent, int numOfWeights, int parentSize, short level, GraphNode node) throws RuntimeException {
         if (Configs.useCachedPPRs) {
-            /*
-            float[] pprFromDB = HierarchyNode.getUserPPRFromDB(HierarchyNode.id, numOfWeights, node);
-            if (pprFromDB != null) {
-            node.addPPR(this, pprFromDB);
-            return pprFromDB;
+            float pprFromDB = HierarchyNode.getUserPPRFromDB(topicNodeId, numOfWeights, node, alpha);
+            if (pprFromDB != -1) {
+                return pprFromDB;
             }
-             */
         }
         //        double defaultVal;
         //        if (parent.size() > 10 * topic.size()) {
@@ -146,9 +137,10 @@ public abstract class PPRCalculator implements MeasureCalculator {
         }
         for (GraphNode u : parent) {
             float[] tmpArray = u.getTmpArray();
-            float[] ppr = Arrays.copyOfRange(tmpArray, numOfWeights, 2 * numOfWeights);
+            float ppr = tmpArray[numOfWeights];
             u.setTmpArray(null);
             u.addMeasure(this, ppr);
+            HierarchyNode.userPPRCount++;
         }
         System.out.println("PPR: " + this);
         return node.getMeasure(this);

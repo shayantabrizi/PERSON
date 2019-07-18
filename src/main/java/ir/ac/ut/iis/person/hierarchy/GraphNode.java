@@ -7,6 +7,7 @@ package ir.ac.ut.iis.person.hierarchy;
 
 import ir.ac.ut.iis.retrieval_tools.domain.Edge;
 import ir.ac.ut.iis.retrieval_tools.domain.Node;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collections;
@@ -20,7 +21,7 @@ import java.util.List;
 public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, IUser> {
 
     private final ObjectArrayList<HierarchicalEdge> edges = new ObjectArrayList<>();
-    private final Object2ObjectOpenHashMap<MeasureCalculator, float[]> measure = new Object2ObjectOpenHashMap<>(1, .75f);
+    private final Object2FloatOpenHashMap<MeasureCalculator> measure = new Object2FloatOpenHashMap<>(1, .75f);
     private float[][] degree;
     private final HierarchyNode hierarchyNode;
     private float[] tmpArray;
@@ -91,15 +92,15 @@ public class GraphNode extends Node<GraphNode, GraphNode.HierarchicalEdge, IUser
         return get;
     }
 
-    public Object2ObjectOpenHashMap<MeasureCalculator, float[]> getMeasure() {
+    public Object2FloatOpenHashMap<MeasureCalculator> getMeasure() {
         return measure;
     }
 
-    public float[] getMeasure(MeasureCalculator clusterId) {
-        return measure.get(clusterId);
+    public float getMeasure(MeasureCalculator clusterId) {
+        return measure.getOrDefault(clusterId, -1);
     }
 
-    public void addMeasure(MeasureCalculator clusterId, float[] measure) {
+    public void addMeasure(MeasureCalculator clusterId, float measure) {
         this.measure.put(clusterId, measure);
     }
 

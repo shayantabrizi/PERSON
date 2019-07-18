@@ -19,7 +19,7 @@ public class MySQLConnector {
 
     private static final String serverAddress = "localhost:3306";
     private static final String username = "root";
-    private static final String password = "";
+    private static final String password = "11";
 
     static Connection conn = null;
     protected Scanner fileScanner;
@@ -33,13 +33,16 @@ public class MySQLConnector {
 //            Class.forName(driverName);
 
 // Create a connection to the database
-            String url = "jdbc:mysql://" + serverAddress + "/" + database_name + "?verifyServerCertificate=false&useSSL=true"; // a JDBC url
+            String url = "jdbc:mysql://" + serverAddress + "/" + database_name + "?verifyServerCertificate=false&useSSL=true&rewriteBatchedStatements=true"; // a JDBC url
             conn = DriverManager.getConnection(url, username, password);
 //        } catch (ClassNotFoundException e) {
 //            System.out.println("class not found exception:");
 //            e.printStackTrace();
 //            throw new RuntimeException();
 //// Could not find the database driver
+//            conn.setReadOnly(true);
+            conn.setAutoCommit(false);
+            conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
         } catch (SQLException e) {
             System.out.println("SQL exception (could not find database");
             e.printStackTrace();

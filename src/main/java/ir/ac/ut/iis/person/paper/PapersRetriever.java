@@ -16,6 +16,9 @@ import ir.ac.ut.iis.person.base.Retriever;
 import ir.ac.ut.iis.person.base.Searcher;
 import ir.ac.ut.iis.person.datasets.citeseerx.old.MultiDisciplinaryAuthorExtractor;
 import ir.ac.ut.iis.person.evaluation.Evaluator;
+import ir.ac.ut.iis.person.hierarchy.GraphNode;
+import ir.ac.ut.iis.person.hierarchy.Hierarchy;
+import ir.ac.ut.iis.person.hierarchy.HierarchyNode;
 import ir.ac.ut.iis.person.hierarchy.User;
 import ir.ac.ut.iis.person.query.Query;
 import ir.ac.ut.iis.person.query.QueryBatch;
@@ -69,11 +72,25 @@ public class PapersRetriever extends Retriever {
     private Query lastQuery;
 
     private static final Instances instances = new Instances();
+    public static String[][] authors;
 
     public PapersRetriever(String name, Evaluator evaluator, IndexSearcher indexSearcher, String queriesFile) {
         super(name, evaluator);
         this.rootSearcher = indexSearcher;
         this.rootReader = indexSearcher.getIndexReader();
+        authors = new String[rootReader.maxDoc()][];
+        for (int i = 0; i < rootReader.maxDoc(); i++) {
+            try {
+                Document document = rootReader.document(i);
+                String[] split = document.get("authors").split(" ");
+                authors[i] = new String[split.length];
+                for (int j = 0; j < split.length; j++) {
+                    authors[i][j] = split[j];
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(PapersRetriever.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         if (Configs.runStage.equals(Configs.RunStage.NORMAL) || Configs.runStage.equals(Configs.RunStage.CREATE_METHOD_BASED_JUDGMENTS)) {
             try {
                 this.scanner = new Scanner(new FileInputStream(queriesFile));
@@ -169,6 +186,7 @@ public class PapersRetriever extends Retriever {
 //        for (int i = 0; i < 200_000; i++) {
 //            Main.random(100);
 //        }
+        Hierarchy<?> hier = DatasetMain.getInstance().loadHierarchy(Configs.datasetRoot + Configs.graphFile, Configs.datasetRoot + "clusters/" + Configs.clustersFileName + ".tree", Configs.clustersFileName, false, true, false, false);
         File yourFile = new File(queryFile);
         yourFile.getParentFile().mkdirs();
         Set<Integer> set = new HashSet<>();
@@ -207,15 +225,34 @@ public class PapersRetriever extends Retriever {
                         continue;
                     }
                 }
+                
 
                 String author = authors[0];
 
+                GraphNode userNode = hier.getUserNode(Integer.parseInt(author));
+                boolean check = !checkBalanceness(userNode);
+                if (check)
+                    continue;
+                        
                 writer.write(document.get("id") + " " + author + "\n");
             }
         } catch (IOException ex) {
             Logger.getLogger(PapersRetriever.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException();
         }
+    }
+
+    public static boolean checkBalanceness(GraphNode userNode) {
+        HierarchyNode hn = userNode.getHierarchyNode();
+        boolean check = false;
+        while (hn.getId() != Integer.MIN_VALUE) {
+            if (hn.getParent().usersNum() > 100 * hn.usersNum()) {
+                check = true;
+                break;
+            }
+            hn = hn.getParent();
+        }
+        return !check;
     }
 
     public void createMultidisciplinaryQueries(String queryFile) {
@@ -299,7 +336,6 @@ public class PapersRetriever extends Retriever {
 //
 //        return get.split(" ")[0];
 //    }
-    
     public Set<Query> getTestQueries() {
         Set<Query> ss = new HashSet<>();
         try (Scanner sc = new Scanner(new FileInputStream(Configs.datasetRoot + "/queries/" + Configs.queryFile))) {

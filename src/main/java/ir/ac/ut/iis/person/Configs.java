@@ -33,9 +33,9 @@ public class Configs {
     public static final String badDocumentsFileName = "badDocuments.txt";   // Just keep it unchanged       
 
     // Fundamental parameters
-    public static String datasetName = "aminer";     // The name of the dataset folder
+    public static String datasetName = "aminer_>2002";     // The name of the dataset folder
     public static String datasetRoot = getDatasetRoot();      // The root address of the dataset
-    public static String database_name = "aminerDB";     // The MySQL database name
+    public static String database_name = "aminer_>2002";     // The MySQL database name
     public static String databaseTablesPostfix = "";    // Just keep it unchanged
     public static String queryField = "title";          // The field of the query paper used as query. Keep it unchanged
     public static int mapBias = 0;                      // Just keep it unchanged
@@ -47,8 +47,8 @@ public class Configs {
     public static Evaluator evaluator = new PERSONEvaluator();//new MethodBasedEvaluator("queries-agg-100.txt");      // Indicates whether to use PERSON, ASPIRE, or MethodBasedEvaluator for evaluation
 //    public static Evaluator evaluator = null;
     public static int runNumber = 176;                  // Just a number so one can execute different runs without collision in the files or folders
-    public static String indexName = "index_15_SymmetricAlpha";      // The name of the index folder
-    public static String queryFile = "general.txt";     // The name of the queries file
+    public static String indexName = "index_PPR";      // The name of the index folder
+    public static String queryFile = "test.txt";     // The name of the queries file
 
     // PERSON parameters
     public static boolean ignoreSelfCitations = false;      // Indicates whether ignore self-citations heuristic is used or not. When true set useSearchCaching=false
@@ -69,7 +69,7 @@ public class Configs {
     public static boolean loadGraph = false;                // Just keep it unchanged
     public static double pagerankAlpha = 0.15;              // the Alpha value in PageRank calculation
     public static String clustersFileName = null;     // Keep it unchanged
-    public static int pruneThreshold = 1000;
+    public static int pruneThreshold = 1000;            // -1 for not pruning
 
     // SocialTextual parameters
     public static int socialTextualDegree = 2;        // Keep it unchanged. Use friends and friends-of-friends in Social-Textual
@@ -81,7 +81,7 @@ public class Configs {
     // Topic parameters
     public static boolean useCachedTopics = true;       // Keep it true
     public static String topicsName = "15_SymmetricAlpha";      // The name of the topics folder
-    public static String profileTopicsDBTable = "_15_SymmetricAlpha";        // Just ignore it
+    public static String profileTopicsDBTable = "_PPR";        // Just ignore it
     public static boolean myCosineWeightType = true;        // Just ignore it
     public static boolean removeCurrentPaperFromAuthorTopics = true;       // Ignore current paper's topics in author's topics. Not necessarily implemented completely
     public static boolean useDirichletEstimationForAuthorTopics = false;    // Just ignore it
@@ -150,6 +150,7 @@ public class Configs {
         CREATE_INDEXES_WITH_TOPICS_STEP1,
         CREATE_INDEXES_WITH_TOPICS_STEP2,
         CREATE_INDEXES_WITH_TOPICS_STEP3,
+        CREATE_INDEXES_WITH_PPRs,
         CREATE_QUERIES,
         CREATE_SOCIAL_TEXTUAL_DATABASE,
         CREATE_METHOD_BASED_JUDGMENTS;

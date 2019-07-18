@@ -111,7 +111,7 @@ public class Hierarchy<U extends User> {
                 int code = Integer.parseInt(tokenizer.nextToken());
                 StringTokenizer hierarchy = new StringTokenizer(tokenizer.nextToken(), ":");
                 HierarchyNode currentNode = rootNode;
-                currentNode.setId(-1);
+                currentNode.setId(Integer.MIN_VALUE);
                 boolean tl = true;
                 for (StringTokenizer stringTokenizer = hierarchy; stringTokenizer.hasMoreTokens();) {
                     String token = stringTokenizer.nextToken();
@@ -320,4 +320,5 @@ public class Hierarchy<U extends User> {
         userNodeMapping.put(id, user);
         return user;
     }
+    
 }

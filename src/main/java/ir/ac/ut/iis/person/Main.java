@@ -5,7 +5,8 @@
 package ir.ac.ut.iis.person;
 
 import ir.ac.ut.iis.person.base.Retriever;
-import ir.ac.ut.iis.person.paper.TopicsProfileGenerator;
+import ir.ac.ut.iis.person.hierarchy.Hierarchy;
+import ir.ac.ut.iis.person.hierarchy.PPRLoader;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,13 +33,54 @@ public class Main {
     public static int i;
 
     public static void main(String[] args) throws FileNotFoundException, CorruptIndexException, LockObtainFailedException, LockObtainFailedException, IOException, DOMException, ParserConfigurationException, SAXException, QueryNodeException, FileNotFoundException, FileNotFoundException, IOException {
+        Configs.loadGraph = true;
+                Configs.clustersFileName = "PPC-1.3";
+
+        Configs.ignoreTopLevelCluster = true;
 //        createIndex(Configs.topicsName, Configs.profileTopicsDBTable, Configs.RunStage.CREATE_INDEXES);    
 //        createIndex(Configs.topicsName, Configs.profileTopicsDBTable, Configs.RunStage.CREATE_INDEXES_WITH_TOPICS_STEP1);     
 //        createIndex(Configs.topicsName, Configs.profileTopicsDBTable, Configs.RunStage.CREATE_INDEXES_WITH_TOPICS_STEP2);     
-//        createIndex(Configs.topicsName, Configs.profileTopicsDBTable, Configs.RunStage.CREATE_QUERIES);     
+        createIndex(Configs.topicsName, Configs.profileTopicsDBTable, Configs.RunStage.CREATE_QUERIES);     
 //        createIndex(Configs.topicsName, Configs.profileTopicsDBTable, Configs.RunStage.CREATE_SOCIAL_TEXTUAL_DATABASE);     
+//        Configs.skipQueries = 0;
+//        Configs.useSearchCaching = false;
+//        Configs.datasetName = "aminer_>2002";
+//        Configs.database_name = "aminer_>2002_2";
+//        Configs.indexName = "index_PPR";
+//        Configs.clustersFileName = "PPC-1.3";
+//        Configs.topicsName = "PPR";
+//        Configs.runNumber = 200;
+//        ir.ac.ut.iis.person.AddSearchers.reinitialize();
+//        Configs.multiThreaded = false;
+//        Configs.baseSimilarityName = "MyLM";
+//        Configs.lmDirichletMu = 400;
+//        ir.ac.ut.iis.person.AddSearchers.reinitialize();
+//        Configs.loadGraph = true;
+//        Configs.ignoreTopLevelCluster = true;
+//        Configs.useCachedPPRs = true;
+//        Configs.pruneThreshold = -1;
+//        Configs.queryCount = 100;
+//        try (PapersMain main = new PapersMain()) {
+//            main.main("experiment");
+//            Hierarchy<?> hier3 = DatasetMain.getInstance().loadHierarchy(Configs.datasetRoot + Configs.graphFile, Configs.datasetRoot + "clusters/" + Configs.clustersFileName + ".tree", Configs.clustersFileName, false, true, false, false);
+//            PPRLoader.load(hier3, "../CSR-master/PPR_minimal.txt");
+//            createIndex(Configs.topicsName, Configs.profileTopicsDBTable, Configs.RunStage.CREATE_INDEXES);
+//        }
+//Map<Integer, Float> map = new HashMap<>();
+//map.put(1, Float.NaN);
+//int in = 5;
+//                    byte[] pprs;
+//                    try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+//                        ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream);
+//                        out.writeObject(in);
+//                        pprs = byteArrayOutputStream.toByteArray();
+//                    } catch (IOException ex) {
+//                        Logger.getLogger(PapersExtractor.class.getName()).log(Level.SEVERE, null, ex);
+//                        throw new RuntimeException();
+//                    }
+
 //        expAxioms();
-        expMoreAxioms();
+//        expMoreAxioms();
 //        expCampos();
 //        expCamposTau();
 //        expCompare();
@@ -138,7 +180,9 @@ public class Main {
                 throw new RuntimeException();
             }
         }
+        System.gc();
         System.out.println(outputPath);
+        System.out.println("millis4: " + System.currentTimeMillis());
         for (i = 0; i < Configs.queryCount; i++) {
             // @TODO: Shayan
 //                        hier.node.getNodeId("0").getNodeId("1").calculateClosenessCenter();
@@ -153,6 +197,7 @@ public class Main {
 
             retriever.writeResults(out, perQueryOutput);
         }
+        System.out.println("millis3: " + System.currentTimeMillis());
 
         retriever.writeSignificantTestData(outputPath + "-sig");
         try {

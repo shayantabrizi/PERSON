@@ -17,7 +17,7 @@ public interface MeasureCalculator {
 
     boolean equals(Object obj);
 
-    float[] calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level);
+    float calc(int numOfWeights, GraphNode node, Iterable<GraphNode> parent, int parentSize, short level);
     
     int getSeedsId();
 
